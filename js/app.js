@@ -71,7 +71,7 @@ function header(){
 }
 function footer(){
   return `<footer class="site"><div class="cols">
-   <div><a class="logo" href="index.html">Moorpankh</a><p style="max-width:34ch;margin-top:14px">Vintage sarees and handmade jewellery — heritage, craftsmanship and timeless elegance from ${C.city}.</p></div>
+   <div><a class="logo foot-logo" href="index.html" aria-label="Moorpankh"><img src="images/logo.png" alt="Moorpankh"></a><p style="max-width:34ch;margin-top:14px">Vintage sarees and handmade jewellery — heritage, craftsmanship and timeless elegance from ${C.city}.</p></div>
    <div><h4>Shop</h4><ul><li><a href="shop.html">All pieces</a></li><li><a href="sarees.html">Vintage sarees</a></li><li><a href="shop.html?cat=suits">Ready to wear</a></li><li><a href="jewellery.html">Jewellery</a></li><li><a href="collections.html">Collections</a></li></ul></div>
    <div><h4>Support</h4><ul><li><a href="shipping.html">Shipping &amp; returns</a></li><li><a href="faq.html">FAQs</a></li><li><a href="contact.html">Contact</a></li><li><a href="journal.html">Journal</a></li><li><a href="story.html">Our story</a></li></ul></div>
    <div><h4>Connect</h4><ul><li><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">Instagram @${C.instagram}</a></li><li><a href="${waLink('Hello Moorpankh!')}" target="_blank" rel="noopener">WhatsApp</a></li><li>${C.email}</li></ul></div>
@@ -103,6 +103,7 @@ pages.home = () => {
   <div class="mk">
    <div class="mk-main">
     <section class="mk-hero" id="hero" aria-label="Moorpankh">
+      <img class="mk-peacock-wm" src="images/peacock.png" alt="" aria-hidden="true">
       <div class="mk-copy">
         <p class="mk-eye">Timeless. Traditional. Yours.</p>
         <h1 class="mk-h1"><span class="ln"><i>Vintage</i></span><span class="ln gold"><i>Elegance</i></span><span class="ln sm"><i>woven for you.</i></span></h1>
@@ -116,6 +117,7 @@ pages.home = () => {
         <figure class="t3"><div class="pic"><img src="images/real/white-sofa.jpg" alt="Noor e Afshan semi formal saree" data-par></div><figcaption><b>Semi Formal</b><small>Timeless. Graceful. Iconic.</small></figcaption></figure>
       </div>
     </section>
+    <div class="mk-orn" aria-hidden="true"><i></i><img src="images/peacock.png" alt=""><i></i></div>
     <div class="mk-water" aria-hidden="true">Moorpankh Vintage Couture</div>
 
     <section class="mk-master"><div class="mk-mt"><h2 class="mk-h2">Masterpieces<br>in every<br>thread</h2><p>From hand block prints to heavy banarsi, every piece is chosen for its craft, so it can be worn for years.</p><a class="btn mag" href="story.html">Our Story</a></div>
@@ -136,7 +138,7 @@ pages.home = () => {
 
     <div class="mk-box"><div class="mk-head"><small>Featured pieces</small></div><div class="mk-mini">${side.map(([id,s])=>{const p=byId(id);return `<a href="product.html?id=${id}" class="rv"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name.replace(/ Saree| Necklace/,""))}</b><small>${p.price?money(p.price):"On request"}</small></a>`}).join("")}</div></div>
 
-    <div class="mk-box mk-dark" id="mkdark"><canvas id="jGL" aria-hidden="true"></canvas><small>Our promise</small><h2 class="mk-h3">Premium quality.<br>Made with love.<br>Just for you.</h2>
+    <div class="mk-box mk-promise" id="mkdark"><img class="peacock" src="images/peacock.png" alt="" aria-hidden="true"><small>Our promise</small><h2 class="mk-h3">Premium quality.<br>Made with love.<br>Just for you.</h2>
       <ul>${[["fabric","Beautiful fabrics"],["hand","Hand-finished"],["truck",C.deliveryEstimate],["cash","Cash on Delivery"]].map(f=>`<li>${svg[f[0]]}<span>${f[1]}</span></li>`).join("")}</ul><a class="btn gold mag" href="shop.html">Shop Now →</a></div>
 
     <div class="mk-box"><div class="mk-head"><small>From the journal</small><a href="journal.html">View all →</a></div>
@@ -363,12 +365,14 @@ function homeMock(delay){
   reveal();
   document.querySelectorAll(".mk-collage .pic").forEach((p,i)=>gsap.fromTo(p,{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)",duration:1.3,ease:"expo.out",delay:i*.12,scrollTrigger:{trigger:".mk-collage",start:"top 80%",once:true}}));
   gsap.from(".mk-cats a",{y:30,opacity:0,duration:.9,stagger:.08,ease:"power3.out",scrollTrigger:{trigger:".mk-cats",start:"top 90%",once:true}});
-  const jc=$("#jGL"); if(jc&&window.MP_GL) MP_GL.jewel(jc,$("#mkdark"),true);
+  gsap.from(".mk-promise .peacock",{y:60,opacity:0,rotate:4,duration:1.6,ease:"expo.out",scrollTrigger:{trigger:".mk-promise",start:"top 85%",once:true}});
+  gsap.to(".mk-promise .peacock",{y:-14,duration:3.2,ease:"sine.inOut",yoyo:true,repeat:-1});
+  gsap.to(".mk-peacock-wm",{yPercent:-12,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
 }
 function MP_start(pg){
   const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches||location.search.includes("nomotion");
   const pre=document.createElement("div");
-  const wantPre=pg==="home"&&!reduce&&!location.search.includes("nopre")&&!sessionStorage.getItem("mp_pre");
+  const wantPre=!reduce&&!location.search.includes("nopre")&&!sessionStorage.getItem("mp_pre");
   if(!hasG()||reduce){
     $$(".rv").forEach(e=>e.style.cssText="opacity:1;transform:none");
     if(pg==="home"&&window.MP_GL){ try{ homeHeroStatic() }catch(e){} }
@@ -380,12 +384,16 @@ function MP_start(pg){
   let delay=.15;
   if(wantPre){
     try{sessionStorage.setItem("mp_pre","1")}catch(e){}
-    pre.id="pre"; pre.innerHTML='<div><div class="w">'+"Moorpankh".split("").map(c=>`<i>${c}</i>`).join("")+'</div><small>Elegance beyond time</small></div>'; document.body.appendChild(pre);
-    gsap.set("#pre .w i",{yPercent:110});
-    const t=gsap.timeline({onComplete:()=>pre.remove()});
-    t.to("#pre .w i",{yPercent:0,duration:1,ease:"expo.out",stagger:.05}).to("#pre small",{opacity:.8,duration:.6},"<.4")
-     .to(pre,{clipPath:"inset(0 0 100% 0)",duration:1.1,ease:"expo.inOut"},"+=.5");
-    delay=2.7; setTimeout(()=>pre.remove(),6000);
+    pre.id="pre"; pre.innerHTML='<div class="pl-strips">'+"<i class=\"pl-s\"></i>".repeat(6)+'</div><div class="pl-in"><div class="pl-logo"><img src="images/logo.png" alt="Moorpankh"></div><div class="pl-bar"><i></i></div><div class="pl-n"><b id="pln">0</b>%</div></div>'; document.body.appendChild(pre);
+    document.documentElement.style.overflow="hidden";
+    const cnt={n:0};
+    const t=gsap.timeline({onComplete:()=>{pre.remove();document.documentElement.style.overflow=""}});
+    t.fromTo("#pre .pl-logo",{clipPath:"inset(0 100% 0 0)"},{clipPath:"inset(0 0% 0 0)",duration:1.4,ease:"power3.inOut"},0.1)
+     .fromTo("#pre .pl-bar i",{scaleX:0},{scaleX:1,duration:1.6,ease:"power2.inOut"},0.1)
+     .to(cnt,{n:100,duration:1.6,ease:"power2.inOut",onUpdate:()=>{const e=document.getElementById("pln");if(e)e.textContent=Math.round(cnt.n)}},0.1)
+     .to("#pre .pl-in",{opacity:0,y:-24,duration:.5,ease:"power2.in"},"+=.2")
+     .to("#pre .pl-s",{yPercent:-101,duration:1.1,ease:"expo.inOut",stagger:.09},"<.15");
+    delay=2.7; setTimeout(()=>{pre.remove();document.documentElement.style.overflow=""},7000);
   }
   reveal();
   $$(".split-line").forEach(el=>{splitWords(el);gsap.from($$(".w i",el),{yPercent:115,duration:1.2,ease:"expo.out",stagger:.07,scrollTrigger:{trigger:el,start:"top 88%",once:true}})});

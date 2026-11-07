@@ -115,3 +115,37 @@ footer .copy{border-top-color:rgba(0,0,0,.1)}
   nav.main.open{border-radius:14px;background:var(--white);box-shadow:0 10px 40px rgba(0,0,0,.15)}
   .btn.shopnow{display:none}
 }
+
+/* ===== Moorpankh graphics (logo + peacock artwork) ===== */
+.logo.has-logo img{height:54px;width:auto}
+.foot-logo img{height:84px;width:auto}
+footer.site{position:relative;overflow:hidden}
+footer.site::after{content:"";position:absolute;right:4%;bottom:-6%;width:min(26vw,340px);height:78%;background:url(../images/peacock.png) right bottom/contain no-repeat;opacity:.16;pointer-events:none}
+footer .cols,footer .copy{position:relative;z-index:1}
+.mk-hero{position:relative}
+.mk-peacock-wm{position:absolute;left:-3%;top:12%;height:78%;width:auto;opacity:.09;pointer-events:none;z-index:0}
+.mk-hero>*:not(.mk-peacock-wm){position:relative;z-index:1}
+.mk-orn{display:flex;align-items:center;gap:16px;margin:2px 0}
+.mk-orn i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-l),transparent)}
+.mk-orn img{height:54px;width:auto}
+/* "Our promise" card: gold-cream with the peacock */
+.mk-promise{position:relative;overflow:hidden;background:linear-gradient(160deg,#f4e8cf,#ead6aa);border-color:#e3cf9f;min-height:420px}
+.mk-promise small{color:#8a6a2b;font-weight:500}
+.mk-promise .mk-h3{margin:8px 0 22px;max-width:11ch;color:var(--ink);position:relative;z-index:2}
+.mk-promise ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:14px 8px;margin-bottom:22px;position:relative;z-index:2;max-width:62%}
+.mk-promise li{display:flex;flex-direction:column;gap:6px;font-size:.74rem;align-items:flex-start;color:#4a3b22}
+.mk-promise svg{stroke:#8a6a2b}
+.mk-promise .btn{border-radius:8px;position:relative;z-index:2;padding:.85em 1.4em;font-size:.64rem}
+.mk-promise .peacock{position:absolute;right:-2%;bottom:-2%;height:62%;width:auto;z-index:1;filter:drop-shadow(0 10px 18px rgba(80,50,10,.25))}
+/* swipe loader */
+#pre{background:transparent;display:block;color:inherit}
+#pre .pl-strips{position:absolute;inset:0;display:flex}
+#pre .pl-s{flex:1;background:#faf7f1;border-right:1px solid rgba(180,138,60,.22);display:block}
+#pre .pl-s:last-child{border-right:0}
+#pre .pl-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:2}
+#pre .pl-logo{width:min(560px,78vw)}
+#pre .pl-logo img{width:100%;height:auto;display:block}
+#pre .pl-bar{width:min(320px,60vw);height:2px;background:rgba(28,25,21,.1);overflow:hidden}
+#pre .pl-bar i{display:block;height:100%;background:var(--gold);transform-origin:left}
+#pre .pl-n{font:italic 400 1.15rem var(--serif);color:var(--gold);letter-spacing:.04em}
+@media(max-width:760px){.mk-promise ul{max-width:100%}.mk-promise .peacock{opacity:.35;height:70%}.mk-peacock-wm{display:none}.foot-logo img{height:64px}}
