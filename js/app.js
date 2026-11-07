@@ -86,8 +86,8 @@ pages.home = () => {
   const I=(f,alt,x="")=>`<img src="images/${f}.jpg" alt="${alt}" ${x}>`;
   // Sample photos stand in for product photos on the home page only. Put a real photo at images/products/<id>.jpg and it replaces the sample automatically.
   const thumb=(p,sample)=>`<img src="images/products/${p}.jpg" alt="${esc(byId(p).name)}" loading="lazy" onerror="this.onerror=null;this.src='images/${sample}.jpg'">`;
-  const feat=[["mango-cotton","model-palace"],["rust-banarsi","model-plants"],["black-banarsi","model-tree"],["noor-e-afshan","hero-2"]];
-  const side=[["viva-la-vida","hero-3"],["white-plum-cotton","model-green"],["raja-rani-necklace","jewel-6"],["pink-kaftan","hero-4"]];
+  const feat=[["mango-cotton","model-palace"],["noor-e-afshan","hero-2"],["lavender-dream","model-red"],["azure-elegance","model-tree"]];
+  const side=[["maroon-formal","hero-3"],["green-chiffon-banarsi","model-green"],["ethnic-bangles","jewel-6"],["hair-accessory","jewel-7"]];
   const svg={
     saree:'<svg viewBox="0 0 40 40"><path d="M20 4c-3 0-5 2-5 5s2 4 5 4 5-1 5-4-2-5-5-5zM14 16c-2 8-4 14-5 20h22c-1-6-3-12-5-20M16 20c6 3 10 8 12 16"/></svg>',
     jewel:'<svg viewBox="0 0 40 40"><path d="M8 8c0 14 5 20 12 20S32 22 32 8M20 28v4M17 32h6l-3 5z"/></svg>',
@@ -111,18 +111,18 @@ pages.home = () => {
         <ul class="mk-trust"><li>${svg.truck}<span>Delivery across Pakistan<br><small>${C.deliveryEstimate}</small></span></li><li>${svg.cash}<span>Cash on Delivery<br><small>Pakistan-wide</small></span></li></ul>
       </div>
       <div class="mk-trio">
-        <figure class="t1"><div class="pic">${I("jewel-1","Model wearing kundan jewellery","data-par")}</div><figcaption><b>Jewellery</b><small>Draped in heritage</small></figcaption></figure>
-        <figure class="t2"><div class="pic frame" id="harch"><canvas id="heroGL" aria-hidden="true"></canvas>${I("hero-3","Model in a red banarsi saree","class=\"h-fb\"")}</div><figcaption><b>Vintage Sarees</b><small>Banarsi, block print &amp; zari</small></figcaption></figure>
-        <figure class="t3"><div class="pic">${I("hero-2","Model in a silk saree with jewellery","data-par")}</div><figcaption><b>Silk Sarees</b><small>Timeless. Graceful. Iconic.</small></figcaption></figure>
+        <figure class="t1"><div class="pic"><img src="images/real/blue-brick.jpg" alt="Hand block printed saree" data-par></div><figcaption><b>Hand Block Print</b><small>Printed by hand</small></figcaption></figure>
+        <figure class="t2"><div class="pic frame" id="harch"><canvas id="heroGL" aria-hidden="true"></canvas><img src="images/real/red-arch.jpg" alt="Model in a red banarsi saree" class="h-fb"></div><figcaption><b>Vintage Sarees</b><small>Banarsi, block print &amp; zari</small></figcaption></figure>
+        <figure class="t3"><div class="pic"><img src="images/real/white-sofa.jpg" alt="Noor e Afshan semi formal saree" data-par></div><figcaption><b>Semi Formal</b><small>Timeless. Graceful. Iconic.</small></figcaption></figure>
       </div>
     </section>
     <div class="mk-water" aria-hidden="true">Moorpankh Vintage Couture</div>
 
     <section class="mk-master"><div class="mk-mt"><h2 class="mk-h2">Masterpieces<br>in every<br>thread</h2><p>From hand block prints to heavy banarsi, every piece is chosen for its craft, so it can be worn for years.</p><a class="btn mag" href="story.html">Our Story</a></div>
-      <div class="mk-collage"><div class="pic c1"><img src="images/inset-left.jpg" alt="Model in a saree" onerror="this.onerror=null;this.src='images/model-tree.jpg'"></div><div class="cut c2"><img src="images/cutout-model.png" alt="Model in a statement saree" onerror="this.onerror=null;this.src='images/model-palace.jpg';this.classList.add('fb')"></div><div class="pic c3"><img src="images/inset-jewel.jpg" alt="Handmade jewellery" onerror="this.onerror=null;this.src='images/jewel-5.jpg'"></div><a class="vm" href="sarees.html">View More →</a></div></section>
+      <div class="mk-collage"><div class="pic c1"><img src="images/inset-left.jpg" alt="Model in a purple saree" onerror="this.onerror=null;this.src='images/real/purple-flow.jpg'"></div><div class="cut c2"><img src="images/cutout-model.png" alt="Model in a statement saree" onerror="this.onerror=null;this.src='images/model-palace.jpg';this.classList.add('fb')"></div><div class="pic c3"><img src="images/inset-jewel.jpg" alt="Handmade bangles" onerror="this.onerror=null;this.src='images/real/bangles-flat.jpg'"></div><a class="vm" href="sarees.html">View More →</a></div></section>
 
     <section class="mk-featured"><div class="mk-head"><small>Featured collection</small><a href="shop.html">View All Collection →</a></div>
-      <div class="mk-cards">${feat.map(([id,s])=>{const p=byId(id);return `<a class="mk-card rv" href="product.html?id=${id}"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name)}</b><small>${esc(p.sub)}</small><span class="mk-pr">${money(p.price)}<i>→</i></span></a>`}).join("")}</div></section>
+      <div class="mk-cards">${feat.map(([id,s])=>{const p=byId(id);return `<a class="mk-card rv" href="product.html?id=${id}"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name)}</b><small>${esc(p.sub)}</small><span class="mk-pr">${p.price?money(p.price):"On request"}<i>→</i></span></a>`}).join("")}</div></section>
 
     <section class="mk-banner"><div class="pic">${I("heritage-2","Red sandstone heritage arcade","data-par")}</div><div class="in"><small>Lahore · Heritage</small><h2 class="mk-h2">Rooted in<br>heritage</h2><p>Inspired by the arches, courtyards and palaces where these textiles were once worn.</p><a class="btn gold mag" href="collections.html">View Collections →</a></div></section>
 
@@ -131,16 +131,16 @@ pages.home = () => {
    </div>
 
    <aside class="mk-side">
-    <div class="mk-box mk-celeb"><div><h2 class="mk-h3">Outfits That<br>Celebrate You</h2><a class="btn mag" href="${waLink('Hello Moorpankh! Could you help me choose an outfit?')}" target="_blank" rel="noopener">Style Help →</a></div><div class="pic">${I("jewel-2","Model in a pink saree with gold jewellery","data-par")}</div></div>
+    <div class="mk-box mk-celeb"><div><h2 class="mk-h3">Outfits That<br>Celebrate You</h2><a class="btn mag" href="${waLink('Hello Moorpankh! Could you help me choose an outfit?')}" target="_blank" rel="noopener">Style Help →</a></div><div class="pic"><img src="images/real/mustard-garden.jpg" alt="Model in a mustard saree" data-par></div></div>
     <div class="mk-cats">${[["saree","Sarees","Graceful elegance","sarees.html"],["jewel","Jewellery","Handmade","jewellery.html"],["rtw","Ready to Wear","Co-ords &amp; kaftans","shop.html?cat=suits"],["banarsi","Banarsi","Formal weaves","collections.html#banarsi"]].map(c=>`<a href="${c[3]}" class="rv">${svg[c[0]]}<b>${c[1]}</b><small>${c[2]}</small></a>`).join("")}</div>
 
-    <div class="mk-box"><div class="mk-head"><small>Featured pieces</small></div><div class="mk-mini">${side.map(([id,s])=>{const p=byId(id);return `<a href="product.html?id=${id}" class="rv"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name.replace(/ Saree| Necklace/,""))}</b><small>${money(p.price)}</small></a>`}).join("")}</div></div>
+    <div class="mk-box"><div class="mk-head"><small>Featured pieces</small></div><div class="mk-mini">${side.map(([id,s])=>{const p=byId(id);return `<a href="product.html?id=${id}" class="rv"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name.replace(/ Saree| Necklace/,""))}</b><small>${p.price?money(p.price):"On request"}</small></a>`}).join("")}</div></div>
 
     <div class="mk-box mk-dark" id="mkdark"><canvas id="jGL" aria-hidden="true"></canvas><small>Our promise</small><h2 class="mk-h3">Premium quality.<br>Made with love.<br>Just for you.</h2>
       <ul>${[["fabric","Beautiful fabrics"],["hand","Hand-finished"],["truck",C.deliveryEstimate],["cash","Cash on Delivery"]].map(f=>`<li>${svg[f[0]]}<span>${f[1]}</span></li>`).join("")}</ul><a class="btn gold mag" href="shop.html">Shop Now →</a></div>
 
     <div class="mk-box"><div class="mk-head"><small>From the journal</small><a href="journal.html">View all →</a></div>
-      <div class="mk-stories"><a href="journal.html" class="rv"><div class="pic">${I("model-red","Styling story","loading=\"lazy\"")}</div><b>How to drape a banarsi saree</b></a><a href="journal.html" class="rv"><div class="pic">${I("jewel-3","Jewellery story","loading=\"lazy\"")}</div><b>Mixing vintage jewellery with a plain saree</b></a></div></div>
+      <div class="mk-stories"><a href="journal.html" class="rv"><div class="pic"><img src="images/real/blue-pink-chair.jpg" alt="Styling story" loading="lazy"></div><b>How to drape a banarsi saree</b></a><a href="journal.html" class="rv"><div class="pic"><img src="images/real/earrings-peacock.jpg" alt="Jewellery story" loading="lazy"></div><b>Mixing vintage jewellery with a plain saree</b></a></div></div>
 
     <div class="mk-box mk-help"><small>Need help?</small><h2 class="mk-h3">We're here to help</h2><div class="mk-faq">${faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div><div class="pic">${I("heritage-1","Heritage arch","loading=\"lazy\"")}</div></div>
    </aside>
@@ -346,7 +346,7 @@ function followHover(sel,build){
   });
 }
 function homeMock(delay){
-  const urls=["hero-3","hero-1","hero-4","hero-2"].map(n=>"images/"+n+".jpg");
+  const urls=["red-arch","green-sequin","cream-lamp","purple-flow"].map(n=>"images/real/"+n+".jpg");
   const fb=$(".h-fb"); let gl=null;
   if(window.MP_GL&&MP_GL.ok()){ gl=MP_GL.hero($("#heroGL"),urls); if(gl) fb.style.visibility="hidden"; }
   if(!gl){ const arch=$("#harch"); const imgs=[fb]; urls.slice(1).forEach(u=>{const im=fb.cloneNode();im.src=u;im.style.opacity=0;arch.appendChild(im);imgs.push(im)}); let c=0;
