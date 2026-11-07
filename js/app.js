@@ -55,7 +55,7 @@ function header(){
   const on=(...k)=>k.includes(pg)?"on":"";
   return `<a class="skip" href="#app">Skip to content</a>
   <header class="site" id="hdr">
-    <a class="logo" href="index.html" aria-label="Moorpankh home"><img src="images/logo.png" alt="" onerror="this.remove()">Moorpankh</a>
+    <a class="logo" href="index.html" aria-label="Moorpankh home"><img src="images/logo.png" alt="" onload="this.parentNode.classList.add('has-logo')" onerror="this.remove()"><span class="wm">Moorpankh</span></a>
     <nav class="main" id="nav" aria-label="Main">
       <a href="index.html" class="${on('home')}">Home</a><a href="shop.html" class="${on('shop')}">Shop</a><a href="sarees.html" class="${on('sarees')}">Sarees</a>
       <a href="jewellery.html" class="${on('jewellery')}">Jewellery</a><a href="collections.html" class="${on('collections')}">Collections</a>
@@ -119,7 +119,7 @@ pages.home = () => {
     <div class="mk-water" aria-hidden="true">Moorpankh Vintage Couture</div>
 
     <section class="mk-master"><div class="mk-mt"><h2 class="mk-h2">Masterpieces<br>in every<br>thread</h2><p>From hand block prints to heavy banarsi, every piece is chosen for its craft, so it can be worn for years.</p><a class="btn mag" href="story.html">Our Story</a></div>
-      <div class="mk-collage"><div class="pic c1">${I("model-tree","Model in a black-and-white saree","data-par")}</div><div class="pic c2">${I("model-palace","Model in a yellow saree before a palace garden","data-par")}</div><div class="pic c3">${I("hero-4","Model in a magenta silk saree","data-par")}</div><a class="vm" href="sarees.html">View More →</a></div></section>
+      <div class="mk-collage"><div class="pic c1"><img src="images/inset-left.jpg" alt="Model in a saree" onerror="this.onerror=null;this.src='images/model-tree.jpg'"></div><div class="cut c2"><img src="images/cutout-model.png" alt="Model in a statement saree" onerror="this.onerror=null;this.src='images/model-palace.jpg';this.classList.add('fb')"></div><div class="pic c3"><img src="images/inset-jewel.jpg" alt="Handmade jewellery" onerror="this.onerror=null;this.src='images/jewel-5.jpg'"></div><a class="vm" href="sarees.html">View More →</a></div></section>
 
     <section class="mk-featured"><div class="mk-head"><small>Featured collection</small><a href="shop.html">View All Collection →</a></div>
       <div class="mk-cards">${feat.map(([id,s])=>{const p=byId(id);return `<a class="mk-card rv" href="product.html?id=${id}"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name)}</b><small>${esc(p.sub)}</small><span class="mk-pr">${money(p.price)}<i>→</i></span></a>`}).join("")}</div></section>
