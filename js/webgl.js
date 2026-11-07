@@ -55,7 +55,7 @@ window.MP_GL = (function(){
   }
 
   /* ---------- JEWELLERY 3D ---------- */
-  function jewel(canvas, section){
+  function jewel(canvas, section, local){
     if(!ok()) return null;
     const R=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
     R.setPixelRatio(Math.min(devicePixelRatio,1.75)); R.toneMapping=THREE.ACESFilmicToneMapping; R.toneMappingExposure=1.15; R.outputEncoding=THREE.sRGBEncoding;
@@ -94,10 +94,12 @@ window.MP_GL = (function(){
       const st=new THREE.Mesh(new THREE.SphereGeometry(.09,16,16),ruby); st.position.y=.98; gp.add(st); return gp; }
     const j1=jhumka(); j1.position.set(1.7,-2.4,1); items.push({o:j1,s:.75,f:1.0,r:.6,ph:1});
     const j2=jhumka(); j2.position.set(1.4,2.3,-.5); j2.scale.setScalar(.7); items.push({o:j2,s:.6,f:.9,r:-.5,ph:3});
+    if(local){ // compact arrangement for a card-sized canvas
+      neck.position.set(.05,1.6,0); items[0].s=.8; bang.position.set(.1,-.15,0); items[1].s=.7; j1.position.set(.1,-2.1,0); items[2].s=.8; j2.visible=false; items.splice(3,1); }
     items.forEach(i=>{ i.base=i.o.position.clone(); i.o.scale.multiplyScalar(i.s); scene.add(i.o); });
 
     let mx=0,my=0,scroll=0,visible=false,w=1,h=1;
-    function size(){ w=innerWidth; h=innerHeight; R.setSize(w,h,false); cam.aspect=w/h; cam.fov=w<700?52:38; cam.updateProjectionMatrix(); }
+    function size(){ if(local){ const r=canvas.getBoundingClientRect(); w=Math.max(1,r.width); h=Math.max(1,r.height); } else { w=innerWidth; h=innerHeight; } R.setSize(w,h,false); cam.aspect=w/h; cam.fov=w<700?52:38; cam.updateProjectionMatrix(); }
     addEventListener("resize",size); size();
     addEventListener("mousemove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
     new IntersectionObserver(e=>visible=e[0].isIntersecting).observe(section);
