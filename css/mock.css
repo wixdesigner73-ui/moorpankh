@@ -1,5 +1,5 @@
 /* MOCKUP DIRECTION: couture bento layout (cream / gold / black). Loaded after main.css, overrides its palette. */
-:root{--bg:#faf7f1;--bg2:#f2ebdd;--sage:#efe6d4;--olive:#a27a2e;--olive-d:#1f1a14;--burg:#5a1b25;--burg2:#5a1b25;--gold:#b48a3c;--gold-l:#dcc182;--ink:#1c1915;--muted:#6f6858;--white:#fffdf9}
+:root{--serif:"Playfair Display",Georgia,serif;--sans:"DM Sans",system-ui,sans-serif;--bg:#faf7f1;--bg2:#f2ebdd;--sage:#efe6d4;--olive:#a27a2e;--olive-d:#1f1a14;--burg:#5a1b25;--burg2:#5a1b25;--gold:#b48a3c;--gold-l:#dcc182;--ink:#1c1915;--muted:#6f6858;--white:#fffdf9}
 header.site{background:rgba(250,247,241,.92);backdrop-filter:blur(12px);padding-block:12px;box-shadow:0 1px 0 rgba(0,0,0,.06)}
 .logo{font-style:normal;font-weight:500;letter-spacing:-.01em}
 nav.main{background:transparent;box-shadow:none;padding:0;gap:4px}
