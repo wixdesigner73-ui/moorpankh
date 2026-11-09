@@ -300,6 +300,13 @@ function featherCursor(){
  addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY;trot=-8+Math.max(-26,Math.min(26,(e.clientX-lx)*1.3));lx=e.clientX;if(!vis){vis=true;x=tx;y=ty;c.style.opacity=1}},{passive:true});
  document.addEventListener("mouseleave",()=>{c.style.opacity=0;vis=false});
  document.addEventListener("mouseover",e=>{const t=e.target.closest("a,button,summary,.chip,.pill,.lb-m,.pg,[data-z]");tsc=t?1.35:1;const f=e.target.closest("input,textarea,select");document.documentElement.classList.toggle("native-cur",!!f)});
+ // whole feather is clickable: sample points along its length (tip -> top), not just the tip
+ const SEL="a,button,summary,label,input,select,textarea,.chip,.pill,.lb-m,.pg,[data-z]";
+ const hit=(px,py)=>{const a=(rot*Math.PI)/180,s=Math.sin(a),co=Math.cos(a);
+  for(const d of[0,10,20,30,42,54,64]){const sx=px+s*d*sc,sy=py-co*d*sc;const el=document.elementsFromPoint(sx,sy).find(n=>n.id!=="cur"&&n.closest&&n.closest(SEL));if(el)return el.closest(SEL)}return null};
+ let hov=null;
+ addEventListener("mousemove",e=>{const h=hit(e.clientX,e.clientY);hov=h;tsc=h?1.35:1},{passive:true});
+ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest(SEL))return;const h=hit(e.clientX,e.clientY);if(h&&h!==e.target){e.preventDefault();e.stopPropagation();h.click()}},true);
  document.addEventListener("mousedown",()=>tsc=.85);document.addEventListener("mouseup",()=>tsc=1.2);
  (function loop(){x+=(tx-x)*.35;y+=(ty-y)*.35;rot+=(trot-rot)*.12;trot+=(-8-trot)*.08;sc+=(tsc-sc)*.2;
   c.style.transform="translate("+(x-TX)+"px,"+(y-TY)+"px) rotate("+rot+"deg) scale("+sc+")";requestAnimationFrame(loop)})();
