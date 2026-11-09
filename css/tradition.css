@@ -175,3 +175,17 @@ footer .copy{border-top-color:rgba(255,255,255,.14)}
 main#app::after{content:"";display:block}
 .card-p .ph.lt span{color:var(--ink)}
 .card-p .ph span{font-size:clamp(1.25rem,1.8vw,1.85rem);overflow:hidden;line-height:.92;padding:18px;align-items:flex-end}
+
+/* ===== peacock feather graphics + cursor ===== */
+.tr-feather{position:absolute;height:auto;pointer-events:none;z-index:2;filter:drop-shadow(0 10px 14px rgba(40,50,20,.25));will-change:transform}
+.tr-feather.f1{width:clamp(70px,8.5vw,138px);right:3%;top:15%;transform:rotate(16deg);z-index:7}
+.tr-feather.f2{width:clamp(44px,5vw,80px);right:15%;top:6%;transform:rotate(-14deg);opacity:.95;z-index:1}
+.tr-feather.f3{width:clamp(56px,6.6vw,106px);left:1%;bottom:2%;transform:rotate(-20deg);z-index:7}
+.tr-feather.f4{width:clamp(36px,4vw,64px);left:30%;bottom:-2%;transform:rotate(12deg);z-index:1}
+html.feather-cur,html.feather-cur *{cursor:none!important}
+html.feather-cur input,html.feather-cur textarea,html.feather-cur select{cursor:text!important}
+#cur{transform:none;position:fixed;left:0;top:0;width:34px;height:102px;margin:-102px 0 0 -17px;border-radius:0;background:none;pointer-events:none;z-index:99999;display:block;mix-blend-mode:normal;filter:drop-shadow(0 4px 5px rgba(0,0,0,.28))}
+#cur svg{display:block;width:100%;height:100%}
+#cur.big{width:34px;height:102px;background:none}
+@media(max-width:900px){.tr-feather.f2,.tr-feather.f4{display:none}.tr-feather.f1{top:11%;right:2%;width:64px}.tr-feather.f3{width:56px}}
+.tr-feather.f3{left:-1.5%;bottom:-3%;z-index:1;width:clamp(50px,5.6vw,92px)}

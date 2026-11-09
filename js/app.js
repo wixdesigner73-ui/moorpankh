@@ -56,7 +56,20 @@ const ic={
 function header(){
   const pg=document.body.dataset.page;
   const on=(...k)=>k.includes(pg)?"on":"";
-  return `<a class="skip" href="#app">Skip to content</a>
+  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="pfg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8a6a2b"/><stop offset=".35" stop-color="#2f8a4a"/><stop offset="1" stop-color="#0f6b6f"/></linearGradient>
+<radialGradient id="pfe" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0a1d3a"/><stop offset=".3" stop-color="#0f8f9c"/><stop offset=".62" stop-color="#1b4fa0"/><stop offset="1" stop-color="#1f7a5a"/></radialGradient>
+<symbol id="pfeather" viewBox="0 0 100 300">
+<path d="M50 292C6 214 -2 112 50 8C102 112 94 214 50 292Z" fill="url(#pfg)" opacity=".92"/>
+<g fill="none" stroke="#e3c98a" stroke-width=".9" stroke-linecap="round" opacity=".8"><path d="M50 262.0C45.4 258.8 41.7 250.8 40.8 246.0M50 262.0C54.6 258.8 58.3 250.8 59.2 246.0"/><path d="M50 257.3C44.3 254.1 39.7 246.0 38.5 241.2M50 257.3C55.7 254.1 60.3 246.0 61.5 241.2"/><path d="M50 252.6C43.1 249.4 37.7 241.2 36.3 236.4M50 252.6C56.9 249.4 62.3 241.2 63.7 236.4"/><path d="M50 247.9C42.0 244.6 35.7 236.4 34.1 231.5M50 247.9C58.0 244.6 64.3 236.4 65.9 231.5"/><path d="M50 243.2C41.0 239.9 33.7 231.7 31.9 226.7M50 243.2C59.0 239.9 66.3 231.7 68.1 226.7"/><path d="M50 238.5C39.9 235.2 31.8 226.9 29.8 221.9M50 238.5C60.1 235.2 68.2 226.9 70.2 221.9"/><path d="M50 233.8C38.9 230.5 29.9 222.1 27.7 217.1M50 233.8C61.1 230.5 70.1 222.1 72.3 217.1"/><path d="M50 229.1C37.8 225.7 28.1 217.3 25.7 212.3M50 229.1C62.2 225.7 71.9 217.3 74.3 212.3"/><path d="M50 224.4C36.9 221.0 26.4 212.5 23.7 207.4M50 224.4C63.1 221.0 73.6 212.5 76.3 207.4"/><path d="M50 219.7C35.9 216.3 24.7 207.7 21.9 202.6M50 219.7C64.1 216.3 75.3 207.7 78.1 202.6"/><path d="M50 215.0C35.0 211.6 23.1 203.0 20.1 197.8M50 215.0C65.0 211.6 76.9 203.0 79.9 197.8"/><path d="M50 210.3C34.2 206.8 21.6 198.2 18.4 193.0M50 210.3C65.8 206.8 78.4 198.2 81.6 193.0"/><path d="M50 205.6C33.4 202.1 20.1 193.4 16.8 188.2M50 205.6C66.6 202.1 79.9 193.4 83.2 188.2"/><path d="M50 200.9C32.7 197.4 18.8 188.6 15.3 183.3M50 200.9C67.3 197.4 81.2 188.6 84.7 183.3"/><path d="M50 196.2C32.0 192.7 17.6 183.8 14.0 178.5M50 196.2C68.0 192.7 82.4 183.8 86.0 178.5"/><path d="M50 191.5C31.4 187.9 16.5 179.0 12.8 173.7M50 191.5C68.6 187.9 83.5 179.0 87.2 173.7"/><path d="M50 186.8C30.8 183.2 15.5 174.3 11.7 168.9M50 186.8C69.2 183.2 84.5 174.3 88.3 168.9"/><path d="M50 182.1C30.4 178.5 14.6 169.5 10.7 164.1M50 182.1C69.6 178.5 85.4 169.5 89.3 164.1"/><path d="M50 177.4C29.9 173.8 13.9 164.7 9.9 159.2M50 177.4C70.1 173.8 86.1 164.7 90.1 159.2"/><path d="M50 172.7C29.6 169.0 13.3 159.9 9.2 154.4M50 172.7C70.4 169.0 86.7 159.9 90.8 154.4"/><path d="M50 168.0C29.3 164.3 12.8 155.1 8.7 149.6M50 168.0C70.7 164.3 87.2 155.1 91.3 149.6"/><path d="M50 163.3C29.2 159.6 12.5 150.3 8.3 144.8M50 163.3C70.8 159.6 87.5 150.3 91.7 144.8"/><path d="M50 158.6C29.0 154.9 12.3 145.6 8.1 140.0M50 158.6C71.0 154.9 87.7 145.6 91.9 140.0"/><path d="M50 153.9C29.0 150.1 12.2 140.8 8.0 135.1M50 153.9C71.0 150.1 87.8 140.8 92.0 135.1"/><path d="M50 149.2C29.0 145.4 12.3 136.0 8.1 130.3M50 149.2C71.0 145.4 87.7 136.0 91.9 130.3"/><path d="M50 144.5C29.2 140.7 12.5 131.2 8.3 125.5M50 144.5C70.8 140.7 87.5 131.2 91.7 125.5"/><path d="M50 139.8C29.3 136.0 12.8 126.4 8.7 120.7M50 139.8C70.7 136.0 87.2 126.4 91.3 120.7"/><path d="M50 135.1C29.6 131.3 13.3 121.6 9.2 115.9M50 135.1C70.4 131.3 86.7 121.6 90.8 115.9"/><path d="M50 130.4C29.9 126.5 13.9 116.8 9.9 111.0M50 130.4C70.1 126.5 86.1 116.8 90.1 111.0"/><path d="M50 125.7C30.4 121.8 14.6 112.1 10.7 106.2M50 125.7C69.6 121.8 85.4 112.1 89.3 106.2"/><path d="M50 121.0C30.8 117.1 15.5 107.3 11.7 101.4M50 121.0C69.2 117.1 84.5 107.3 88.3 101.4"/><path d="M50 116.3C31.4 112.4 16.5 102.5 12.8 96.6M50 116.3C68.6 112.4 83.5 102.5 87.2 96.6"/><path d="M50 111.6C32.0 107.6 17.6 97.7 14.0 91.8M50 111.6C68.0 107.6 82.4 97.7 86.0 91.8"/><path d="M50 106.9C32.7 102.9 18.8 92.9 15.3 86.9M50 106.9C67.3 102.9 81.2 92.9 84.7 86.9"/><path d="M50 102.2C33.4 98.2 20.1 88.1 16.8 82.1M50 102.2C66.6 98.2 79.9 88.1 83.2 82.1"/><path d="M50 97.5C34.2 93.5 21.6 83.4 18.4 77.3M50 97.5C65.8 93.5 78.4 83.4 81.6 77.3"/><path d="M50 92.8C35.0 88.7 23.1 78.6 20.1 72.5M50 92.8C65.0 88.7 76.9 78.6 79.9 72.5"/><path d="M50 88.1C35.9 84.0 24.7 73.8 21.9 67.7M50 88.1C64.1 84.0 75.3 73.8 78.1 67.7"/><path d="M50 83.4C36.9 79.3 26.4 69.0 23.7 62.8M50 83.4C63.1 79.3 73.6 69.0 76.3 62.8"/><path d="M50 78.7C37.8 74.6 28.1 64.2 25.7 58.0M50 78.7C62.2 74.6 71.9 64.2 74.3 58.0"/><path d="M50 74.0C38.9 69.8 29.9 59.4 27.7 53.2M50 74.0C61.1 69.8 70.1 59.4 72.3 53.2"/><path d="M50 69.3C39.9 65.1 31.8 54.7 29.8 48.4M50 69.3C60.1 65.1 68.2 54.7 70.2 48.4"/><path d="M50 64.6C41.0 60.4 33.7 49.9 31.9 43.6M50 64.6C59.0 60.4 66.3 49.9 68.1 43.6"/><path d="M50 59.9C42.0 55.7 35.7 45.1 34.1 38.7M50 59.9C58.0 55.7 64.3 45.1 65.9 38.7"/><path d="M50 55.2C43.1 50.9 37.7 40.3 36.3 33.9M50 55.2C56.9 50.9 62.3 40.3 63.7 33.9"/><path d="M50 50.5C44.3 46.2 39.7 35.5 38.5 29.1M50 50.5C55.7 46.2 60.3 35.5 61.5 29.1"/></g>
+<path d="M50 296V70" stroke="#6b4f1a" stroke-width="2" stroke-linecap="round"/>
+<ellipse cx="50" cy="92" rx="27" ry="40" fill="#c9a45b"/>
+<ellipse cx="50" cy="92" rx="21.5" ry="33" fill="#1f7a5a"/>
+<ellipse cx="50" cy="92" rx="16" ry="25" fill="url(#pfe)"/>
+<ellipse cx="50" cy="89" rx="8" ry="13" fill="#0f8f9c"/>
+<ellipse cx="50" cy="87" rx="4.2" ry="7" fill="#0a1d3a"/>
+<ellipse cx="48.5" cy="84" rx="1.4" ry="2.2" fill="#9fe3ea" opacity=".8"/>
+</symbol></defs></svg><a class="skip" href="#app">Skip to content</a>
   <header class="site" id="hdr">
     <a class="logo" href="index.html" aria-label="Moorpankh home"><img src="images/logo.png" alt="" onload="this.parentNode.classList.add('has-logo')" onerror="this.remove()"><span class="wm">Moorpankh</span></a>
     <nav class="main" id="nav" aria-label="Main">
@@ -100,6 +113,7 @@ pages.home = () => {
   return `
   <section class="tr-hero" id="hero" aria-label="Moorpankh">
     <div class="tr-tag"><i></i>#2026 COLLECTION</div>
+    <svg class="tr-feather f1" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f2" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f3" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f4" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg>
     <div class="tr-hwrap"><h1 class="tr-h1"><span class="ln"><i>Tradition,</i></span><span class="ln"><i>Redefined</i></span></h1>${star.replace('class="tr-star"','class="tr-star s1"')}${star.replace('class="tr-star"','class="tr-star s2"')}</div>
     <div class="tr-row"><div class="tr-left"><p class="tr-sub">Vintage sarees and handmade jewellery, inspired by timeless South Asian craftsmanship.</p>
     <div class="tr-stats"><div><b>+${P.length}</b><small>Pieces</small></div><div><b>COD</b><small>Across Pakistan</small></div></div></div>
@@ -368,6 +382,10 @@ function homeTR(delay){
     .fromTo(".tr-gold",{scaleY:0,transformOrigin:"bottom"},{scaleY:1,duration:1.2,ease:"expo.out"},.5)
     .fromTo(".tr-swatch",{scale:.6,opacity:0,rotate:-8},{scale:1,opacity:1,rotate:0,duration:1.1,ease:"back.out(1.6)"},1)
     .fromTo(".tr-model",{yPercent:12,opacity:0},{yPercent:0,opacity:1,duration:1.5,ease:"expo.out"},.6);
+  // peacock feathers: grow in, then sway, drift on scroll
+  tl.fromTo(".tr-feather",{scale:.3,opacity:0,transformOrigin:"50% 100%"},{scale:1,opacity:1,duration:1.6,ease:"elastic.out(1,.6)",stagger:.15},1.1);
+  qa(".tr-feather").forEach((fe,i)=>{gsap.to(fe,{rotation:"+="+(i%2?7:-7),duration:3+i*.6,ease:"sine.inOut",yoyo:true,repeat:-1,transformOrigin:"50% 100%"});
+    gsap.to(fe,{yPercent:-12-(i*5),ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}})});
   // sparkles keep pulsing
   qa(".tr-star").forEach((s,i)=>gsap.to(s,{scale:1.25,rotate:i?-45:45,duration:2.2+i,ease:"sine.inOut",yoyo:true,repeat:-1}));
   // scroll drift
@@ -425,10 +443,15 @@ function MP_start(pg){
 function homeHeroStatic(){ const c=$("#heroGL"); if(c&&MP_GL.ok()){ const g=MP_GL.hero(c,["images/hero-1.jpg","images/hero-3.jpg"]); if(g) $(".h-fb").style.visibility="hidden"; } }
 function pointer(){
   if(!matchMedia("(hover:hover) and (pointer:fine)").matches||!window.gsap)return;
-  const c=document.createElement("div");c.id="cur";document.body.appendChild(c);
-  const x=gsap.quickTo(c,"left",{duration:.25}),y=gsap.quickTo(c,"top",{duration:.25});
-  addEventListener("mousemove",e=>{x(e.clientX);y(e.clientY)});
-  document.addEventListener("mouseover",e=>{const t=e.target.closest(".card-p,.zoom,.hs-i,.h-arch,.cols3 a,.ig a");c.classList.toggle("big",!!t);c.textContent=t?(t.matches(".h-arch")?"Next":"View"):""});
+  document.documentElement.classList.add("feather-cur");
+  const c=document.createElement("div");c.id="cur";c.innerHTML='<svg viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg>';document.body.appendChild(c);
+  gsap.set(c,{transformOrigin:"50% 100%",rotation:-32,xPercent:0,yPercent:0,opacity:0});
+  const x=gsap.quickTo(c,"x",{duration:.16,ease:"power3"}),y=gsap.quickTo(c,"y",{duration:.16,ease:"power3"}),r=gsap.quickTo(c,"rotation",{duration:.55,ease:"power3"});
+  let lx=0,shown=false;
+  addEventListener("mousemove",e=>{if(!shown){shown=true;gsap.to(c,{opacity:1,duration:.3})}x(e.clientX);y(e.clientY);r(-32+gsap.utils.clamp(-28,28,(e.clientX-lx)*1.4));lx=e.clientX});
+  document.addEventListener("mouseleave",()=>gsap.to(c,{opacity:0,duration:.2}));document.addEventListener("mouseenter",()=>{if(shown)gsap.to(c,{opacity:1,duration:.2})});
+  document.addEventListener("mouseover",e=>{const t=e.target.closest("a,button,.card-p,.tr-tile,.zoom,summary,.chip");gsap.to(c,{scale:t?1.45:1,duration:.35,ease:"power3.out"})});
+  document.addEventListener("mousedown",()=>gsap.to(c,{scale:.85,duration:.12}));document.addEventListener("mouseup",()=>gsap.to(c,{scale:1.2,duration:.25,ease:"back.out(3)"}));
   $$(".mag").forEach(b=>{const mx=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),my=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
     b.addEventListener("mousemove",e=>{const r=b.getBoundingClientRect();mx((e.clientX-r.left-r.width/2)*.25);my((e.clientY-r.top-r.height/2)*.35)});
     b.addEventListener("mouseleave",()=>{mx(0);my(0)})});
