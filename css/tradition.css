@@ -189,3 +189,18 @@ html.feather-cur input,html.feather-cur textarea,html.feather-cur select{cursor:
 #cur.big{width:34px;height:102px;background:none}
 @media(max-width:900px){.tr-feather.f2,.tr-feather.f4{display:none}.tr-feather.f1{top:11%;right:2%;width:64px}.tr-feather.f3{width:56px}}
 .tr-feather.f3{left:-1.5%;bottom:-3%;z-index:1;width:clamp(50px,5.6vw,92px)}
+
+/* real peacock feather (photo cut-out) replaces the drawn one */
+.tr-feather{height:auto;width:auto;filter:drop-shadow(0 12px 14px rgba(40,50,20,.28))}
+.tr-feather.f1{width:clamp(60px,7vw,118px);right:2.5%;top:13%;transform:rotate(6deg)}
+.tr-feather.f2{width:clamp(40px,4.4vw,72px);right:14%;top:5%;transform:rotate(-12deg)}
+.tr-feather.f3{width:clamp(48px,5.4vw,88px);left:-1%;bottom:-3%;transform:rotate(-6deg)}
+.tr-feather.f4{width:clamp(32px,3.6vw,58px);left:31%;bottom:-3%;transform:rotate(10deg)}
+#cur{width:52px;height:110px;margin:-109px 0 0 -10px;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3))}
+#cur.big{width:52px;height:110px}
+#cur img{display:block;width:100%;height:100%;object-fit:contain}
+@media(max-width:900px){.tr-feather.f1{width:58px;top:11%;right:2%}.tr-feather.f3{width:50px}}
+.tr-feather.f1{width:clamp(78px,9.4vw,158px);top:19%;right:2%}
+.tr-feather.f2{width:clamp(50px,5.8vw,96px);top:11%;right:17%}
+.tr-feather.f3{width:clamp(64px,7.4vw,124px);left:-2%;bottom:-6%}
+.tr-feather.f4{width:clamp(40px,4.6vw,76px)}

@@ -113,7 +113,7 @@ pages.home = () => {
   return `
   <section class="tr-hero" id="hero" aria-label="Moorpankh">
     <div class="tr-tag"><i></i>#2026 COLLECTION</div>
-    <svg class="tr-feather f1" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f2" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f3" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg><svg class="tr-feather f4" viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg>
+    <img class="tr-feather f1" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f2" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f3" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f4" src="images/feather.png?v=1" alt="" aria-hidden="true">
     <div class="tr-hwrap"><h1 class="tr-h1"><span class="ln"><i>Tradition,</i></span><span class="ln"><i>Redefined</i></span></h1>${star.replace('class="tr-star"','class="tr-star s1"')}${star.replace('class="tr-star"','class="tr-star s2"')}</div>
     <div class="tr-row"><div class="tr-left"><p class="tr-sub">Vintage sarees and handmade jewellery, inspired by timeless South Asian craftsmanship.</p>
     <div class="tr-stats"><div><b>+${P.length}</b><small>Pieces</small></div><div><b>COD</b><small>Across Pakistan</small></div></div></div>
@@ -383,8 +383,8 @@ function homeTR(delay){
     .fromTo(".tr-swatch",{scale:.6,opacity:0,rotate:-8},{scale:1,opacity:1,rotate:0,duration:1.1,ease:"back.out(1.6)"},1)
     .fromTo(".tr-model",{yPercent:12,opacity:0},{yPercent:0,opacity:1,duration:1.5,ease:"expo.out"},.6);
   // peacock feathers: grow in, then sway, drift on scroll
-  tl.fromTo(".tr-feather",{scale:.3,opacity:0,transformOrigin:"50% 100%"},{scale:1,opacity:1,duration:1.6,ease:"elastic.out(1,.6)",stagger:.15},1.1);
-  qa(".tr-feather").forEach((fe,i)=>{gsap.to(fe,{rotation:"+="+(i%2?7:-7),duration:3+i*.6,ease:"sine.inOut",yoyo:true,repeat:-1,transformOrigin:"50% 100%"});
+  tl.fromTo(".tr-feather",{scale:.3,opacity:0,transformOrigin:"19% 99%"},{scale:1,opacity:1,duration:1.6,ease:"elastic.out(1,.6)",stagger:.15},1.1);
+  qa(".tr-feather").forEach((fe,i)=>{gsap.to(fe,{rotation:"+="+(i%2?7:-7),duration:3+i*.6,ease:"sine.inOut",yoyo:true,repeat:-1,transformOrigin:"19% 99%"});
     gsap.to(fe,{yPercent:-12-(i*5),ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}})});
   // sparkles keep pulsing
   qa(".tr-star").forEach((s,i)=>gsap.to(s,{scale:1.25,rotate:i?-45:45,duration:2.2+i,ease:"sine.inOut",yoyo:true,repeat:-1}));
@@ -444,11 +444,11 @@ function homeHeroStatic(){ const c=$("#heroGL"); if(c&&MP_GL.ok()){ const g=MP_G
 function pointer(){
   if(!matchMedia("(hover:hover) and (pointer:fine)").matches||!window.gsap)return;
   document.documentElement.classList.add("feather-cur");
-  const c=document.createElement("div");c.id="cur";c.innerHTML='<svg viewBox="0 0 100 300" aria-hidden="true"><use href="#pfeather"/></svg>';document.body.appendChild(c);
-  gsap.set(c,{transformOrigin:"50% 100%",rotation:-32,xPercent:0,yPercent:0,opacity:0});
+  const c=document.createElement("div");c.id="cur";c.innerHTML='<img src="images/feather.png?v=1" alt="" aria-hidden="true">';document.body.appendChild(c);
+  gsap.set(c,{transformOrigin:"19% 99%",rotation:-6,xPercent:0,yPercent:0,opacity:0});
   const x=gsap.quickTo(c,"x",{duration:.16,ease:"power3"}),y=gsap.quickTo(c,"y",{duration:.16,ease:"power3"}),r=gsap.quickTo(c,"rotation",{duration:.55,ease:"power3"});
   let lx=0,shown=false;
-  addEventListener("mousemove",e=>{if(!shown){shown=true;gsap.to(c,{opacity:1,duration:.3})}x(e.clientX);y(e.clientY);r(-32+gsap.utils.clamp(-28,28,(e.clientX-lx)*1.4));lx=e.clientX});
+  addEventListener("mousemove",e=>{if(!shown){shown=true;gsap.to(c,{opacity:1,duration:.3})}x(e.clientX);y(e.clientY);r(-6+gsap.utils.clamp(-28,28,(e.clientX-lx)*1.4));lx=e.clientX});
   document.addEventListener("mouseleave",()=>gsap.to(c,{opacity:0,duration:.2}));document.addEventListener("mouseenter",()=>{if(shown)gsap.to(c,{opacity:1,duration:.2})});
   document.addEventListener("mouseover",e=>{const t=e.target.closest("a,button,.card-p,.tr-tile,.zoom,summary,.chip");gsap.to(c,{scale:t?1.45:1,duration:.35,ease:"power3.out"})});
   document.addEventListener("mousedown",()=>gsap.to(c,{scale:.85,duration:.12}));document.addEventListener("mouseup",()=>gsap.to(c,{scale:1.2,duration:.25,ease:"back.out(3)"}));
