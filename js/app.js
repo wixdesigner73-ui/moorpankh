@@ -249,7 +249,7 @@ pages.account=()=>{
  setTimeout(()=>{render();if(location.hash==="#orders")setTimeout(()=>{const o=$("#orders");o&&o.scrollIntoView()},50)});
  return `<div class="pg-wrap"><p class="pg-title">My Account</p><div id="acc"></div></div>`};
 
-pages.about=()=>`<section class="ab-hero"><img src="images/model-arch.jpg" alt="Two women in vintage sarees beneath a heritage archway"><div><h1>Moorpankh</h1><small>Scroll to explore</small></div></section>
+pages.about=()=>`<section class="ab-hero"><img src="images/heritage-2.jpg" alt="Red sandstone heritage arcade"><div><h1>Moorpankh</h1><small>Scroll to explore</small></div></section>
  <section class="ab-body"><div><h2>Timeless, on purpose.</h2><p>Moorpankh is a ${esc(C.city.split(",")[0])} label for vintage sarees, traditional fashion and handmade vintage jewellery.</p><p>Moorpankh means peacock feather, a symbol of grace and heritage. Every piece is chosen for its craft, its character and its timelessness, and made to be worn for years.</p><p><a class="btn" href="collections.html">Explore Collections</a></p></div><div class="ab-img"><img src="images/about-1.webp" alt="Moorpankh, in a black-and-white checked saree" loading="lazy"></div></section>
  <section class="ab-wide"><div class="ab-img2"><img src="images/about-2.webp" alt="Moorpankh on stage" loading="lazy"></div></section>
  <section class="ab-pts"><div><b>Vintage Sarees</b><span>Banarsi, hand block printed, cotton and statement sarees.</span></div><div><b>Handmade Jewellery</b><span>Handcrafted vintage-inspired earrings, necklaces, bangles and accessories.</span></div><div><b>Across Pakistan</b><span>Cash on Delivery, estimated ${C.deliveryEstimate}. Order on WhatsApp anytime.</span></div></section>`;
