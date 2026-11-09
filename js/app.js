@@ -116,7 +116,7 @@ pages.home=()=>{
  const L=lookbookItems();
  const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
- const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}" ${i?'loading="lazy"':""}>`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a><div class="mh-dots" id="mhDots"></div></div></section>`;
+ const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}">`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a><div class="mh-dots" id="mhDots"></div></div></section>`;
  return mh+lb};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
@@ -192,7 +192,7 @@ pages.product=()=>{
  document.title=p.name+" — Moorpankh";const m=media(p);
  const imgs=[];if(m.cut)imgs.push({s:m.cut,c:""});else if(m.photos[0])imgs.push({s:m.photos[0],c:"cv"});
  (m.cut?m.photos:m.photos.slice(1)).forEach(s=>imgs.push({s,c:"cv"}));
- const gal=imgs.length?imgs.map((x,i)=>`<div class="pg" data-z="${x.s}">${i===0?`<button class="pg-bm ${wish.includes(p.id)?"on":""}" data-wish="${p.id}" aria-label="Save">${I.bm}</button>`:""}<img class="${x.c}" src="${x.s}" alt="${esc(p.name)}" ${i?'loading="lazy"':""}></div>`).join(""):`<div class="pg empty"><img src="images/peacock.png" alt=""></div>`;
+ const gal=imgs.length?imgs.map((x,i)=>`<div class="pg" data-z="${x.s}">${i===0?`<button class="pg-bm ${wish.includes(p.id)?"on":""}" data-wish="${p.id}" aria-label="Save">${I.bm}</button>`:""}<img class="${x.c}" src="${x.s}" alt="${esc(p.name)}"></div>`).join(""):`<div class="pg empty"><img src="images/peacock.png" alt=""></div>`;
  const rel=P.filter(x=>x.cat===p.cat&&x.id!==p.id).sort((a,b)=>hasPic(b)-hasPic(a)).slice(0,4);
  const msg=`Hello Moorpankh! I'd like to order / ask about: ${p.name}${p.price?" ("+money(p.price)+")":""}. ${location.href}`;
  setTimeout(()=>{
@@ -285,15 +285,23 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
- if(pg==="home"){const hero=$("#mhHero"),sl=[...document.querySelectorAll("#mhHero .mh-s")],dots=$("#mhDots");if(hero&&sl.length>1){let k=0,tm;
-  dots.innerHTML=sl.map((_,n)=>'<button aria-label="Photo '+(n+1)+'"'+(n?"":' class="on"')+' data-n="'+n+'"></button>').join("");
-  const go=n=>{sl[k].classList.remove("on");dots.children[k].classList.remove("on");k=(n+sl.length)%sl.length;sl[k].classList.add("on");dots.children[k].classList.add("on")};
-  const auto=()=>{clearInterval(tm);if(!matchMedia("(prefers-reduced-motion:reduce)").matches)tm=setInterval(()=>{if(!document.hidden&&innerWidth<=900)go(k+1)},4200)};
+ if(pg==="home"){const hero=$("#mhHero"),sl=[...document.querySelectorAll("#mhHero .mh-s")],dots=$("#mhDots");if(hero&&sl.length>1){const n=sl.length;let k=0,tm,dx=0,prev=sl.map((_,q)=>q);
+  dots.innerHTML=sl.map((_,q)=>'<button aria-label="Photo '+(q+1)+'"'+(q?"":' class="on"')+' data-n="'+q+'"></button>').join("");
+  const d0=q=>{let d=((q-k)%n+n)%n;if(d>n/2)d-=n;return d};
+  const draw=(anim=true,drag=false)=>{sl.forEach((el,q)=>{const d=d0(q);const near=Math.abs(d)<=1&&Math.abs(prev[q])<=1;prev[q]=d;
+   el.style.transition=(anim&&near&&!drag)?"transform .55s cubic-bezier(.22,.7,.2,1)":"none";
+   el.style.transform="translateX(calc("+(Math.max(-1,Math.min(1,d))*100)+"% + "+(Math.abs(d)<=1?dx:0)+"px))";el.style.visibility=Math.abs(d)<=1?"visible":"hidden"});
+   [...dots.children].forEach((b,q)=>b.classList.toggle("on",q===k))};
+  const go=q=>{k=(q+n)%n;dx=0;draw()};
+  const auto=()=>{clearInterval(tm);if(!matchMedia("(prefers-reduced-motion:reduce)").matches)tm=setInterval(()=>{if(!document.hidden&&innerWidth<=900&&!held)go(k+1)},4500)};
+  let held=false,x0=null,y0=0,lock=null,w=innerWidth;
   dots.onclick=e=>{const b=e.target.closest("button");if(b){go(+b.dataset.n);auto()}};
-  let x0=null,y0=0;hero.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
-  hero.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){go(k+(dx<0?1:-1));auto()}},{passive:true});
-  hero.addEventListener("click",e=>{if(e.target.closest("a,button"))return;const r=hero.getBoundingClientRect();go(k+(e.clientX>r.left+r.width/2?1:-1));auto()});
-  auto()}}
+  hero.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;lock=null;held=true;w=hero.clientWidth},{passive:true});
+  hero.addEventListener("touchmove",e=>{if(x0===null)return;const mx=e.touches[0].clientX-x0,my=e.touches[0].clientY-y0;if(lock===null&&(Math.abs(mx)>6||Math.abs(my)>6))lock=Math.abs(mx)>Math.abs(my)?"x":"y";if(lock==="x"){dx=mx;draw(false,true)}},{passive:true});
+  const end=e=>{held=false;if(x0===null)return;const m=dx;x0=null;if(lock==="x"&&Math.abs(m)>w*.18){go(k+(m<0?1:-1))}else{dx=0;draw()}if(Math.abs(m)>6)hero._sw=Date.now();auto()};
+  hero.addEventListener("touchend",end,{passive:true});hero.addEventListener("touchcancel",end,{passive:true});
+  hero.addEventListener("click",e=>{if(e.target.closest("a,button")||Date.now()-(hero._sw||0)<400)return;const r=hero.getBoundingClientRect();go(k+(e.clientX>r.left+r.width/2?1:-1));auto()});
+  draw(false);auto()}}
  featherCursor();
  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
  addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});
