@@ -13,7 +13,7 @@ const CATS=[["all","View All"],["best","Best Sellers"],["new","New Arrivals"],["
 const inCat=(p,c)=>c==="all"||(c==="best"?COL.best.includes(p.id):c==="new"?COL.new.includes(p.id):p.cat===c);
 
 /* ---------- media ---------- */
-function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=7":null,photos}}
+function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=9":null,photos}}
 const hasPic=p=>{const m=media(p);return !!(m.cut||m.photos.length)};
 const MARK='<img src="images/peacock.png" alt="" aria-hidden="true">';
 function thumbHTML(p){const m=media(p);return m.cut?`<img src="${m.cut}" alt="${esc(p.name)}">`:m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
