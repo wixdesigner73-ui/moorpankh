@@ -284,8 +284,24 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
+ featherCursor();
  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
  addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});
+}
+
+/* peacock-feather pointer (desktop with a mouse only). The stem tip is the click point. */
+function featherCursor(){
+ if(!matchMedia("(hover:hover) and (pointer:fine)").matches||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ const W=44,H=93,TX=.19*W,TY=.99*H;   // tip position inside the image
+ const c=document.createElement("div");c.id="cur";c.setAttribute("aria-hidden","true");c.innerHTML='<img src="images/feather.png?v=1" alt="">';document.body.appendChild(c);
+ document.documentElement.classList.add("feather-cur");
+ let x=-200,y=-200,tx=x,ty=y,rot=-8,trot=-8,sc=1,tsc=1,vis=false,lx=0;
+ addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY;trot=-8+Math.max(-26,Math.min(26,(e.clientX-lx)*1.3));lx=e.clientX;if(!vis){vis=true;x=tx;y=ty;c.style.opacity=1}},{passive:true});
+ document.addEventListener("mouseleave",()=>{c.style.opacity=0;vis=false});
+ document.addEventListener("mouseover",e=>{const t=e.target.closest("a,button,summary,.chip,.pill,.lb-m,.pg,[data-z]");tsc=t?1.35:1;const f=e.target.closest("input,textarea,select");document.documentElement.classList.toggle("native-cur",!!f)});
+ document.addEventListener("mousedown",()=>tsc=.85);document.addEventListener("mouseup",()=>tsc=1.2);
+ (function loop(){x+=(tx-x)*.35;y+=(ty-y)*.35;rot+=(trot-rot)*.12;trot+=(-8-trot)*.08;sc+=(tsc-sc)*.2;
+  c.style.transform="translate("+(x-TX)+"px,"+(y-TY)+"px) rotate("+rot+"deg) scale("+sc+")";requestAnimationFrame(loop)})();
 }
 document.addEventListener("DOMContentLoaded",boot);
 })();

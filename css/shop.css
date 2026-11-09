@@ -266,3 +266,10 @@ body[data-page=home] .lb{height:calc(100dvh - var(--hh))}
 .ab-wide{max-width:1100px;margin:0 auto;padding:0 var(--pad) 70px}
 .ab-img2{border-radius:var(--r);overflow:hidden;background:var(--soft);max-width:640px;margin:0 auto;aspect-ratio:1/1}
 .ab-img2 img{width:100%;height:100%;object-fit:cover}
+
+/* feather pointer */
+html.feather-cur,html.feather-cur *{cursor:none!important}
+html.feather-cur.native-cur,html.feather-cur.native-cur *{cursor:auto!important}
+html.feather-cur.native-cur #cur{opacity:0!important}
+#cur{position:fixed;left:0;top:0;width:44px;height:93px;pointer-events:none;z-index:99999;opacity:0;transform-origin:19% 99%;will-change:transform;filter:drop-shadow(0 4px 5px rgba(0,0,0,.25));transition:opacity .25s}
+#cur img{display:block;width:100%;height:100%}
