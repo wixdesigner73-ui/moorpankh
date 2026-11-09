@@ -74,3 +74,30 @@ window.MP_PRODUCTS = [
   { id:"ethnic-bangles", name:"Handmade Ethnic Bangles", cat:"jewellery", sub:"Bangles", price:0, c1:"#c0392b", c2:"#e9b84a",
     desc:"Wear sustainability. Wear Moorpankh." }
 ];
+
+/* ============================================================
+   PHOTOS  (edit when you add or change product photos)
+   photos: how many files exist -> images/products/<id>.jpg, <id>-2.jpg, <id>-3.jpg ...
+   cut:    optional full-length cut-out (transparent PNG) used on the white product cards
+   Products not listed here show a quiet placeholder until you add photos.
+   ============================================================ */
+window.MP_MEDIA = {
+  "noor-e-afshan":         { photos:3, cut:"images/cut/white-sofa.png" },
+  "mango-cotton":          { photos:2, cut:"images/cut/mustard-garden.png" },
+  "lavender-dream":        { photos:2, cut:"images/cut/purple-brick.png" },
+  "azure-elegance":        { photos:2, cut:"images/cut/blue-brick.png" },
+  "maroon-formal":         { photos:2, cut:"images/cut/red-arch.png" },
+  "green-chiffon-banarsi": { photos:2, cut:"images/cut/green-lamp.png" },
+  "ethnic-bangles":        { photos:2 },
+  "hair-accessory":        { photos:1 }
+};
+
+/* ============================================================
+   COLLECTIONS  - YOU decide what is a Best Seller / New Arrival.
+   Put product ids in these lists. (Defaults below are placeholders: they just
+   use the pieces that currently have photos. Change them to match your sales.)
+   ============================================================ */
+window.MP_COLLECTIONS = {
+  best: ["noor-e-afshan","lavender-dream","maroon-formal","azure-elegance"],
+  new:  ["green-chiffon-banarsi","mango-cotton","ethnic-bangles","hair-accessory"]
+};

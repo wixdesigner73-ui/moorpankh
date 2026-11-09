@@ -1,478 +1,279 @@
+/* Moorpankh storefront. Plain JS, no libraries. Layout language after colinguest.com. */
 (function(){
-const C = window.MP_CONFIG, P = window.MP_PRODUCTS;
-const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const money = n => C.currency+" "+n.toLocaleString("en-PK");
-const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const store = {
-  get(k,d){try{return JSON.parse(localStorage.getItem("mp_"+k))??d}catch(e){return d}},
-  set(k,v){try{localStorage.setItem("mp_"+k,JSON.stringify(v))}catch(e){}}
+const C=window.MP_CONFIG,P=window.MP_PRODUCTS,MEDIA=window.MP_MEDIA||{},COL=window.MP_COLLECTIONS||{best:[],new:[]};
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const money=n=>C.currency+" "+n.toLocaleString("en-PK");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store={get(k,d){try{return JSON.parse(localStorage.getItem("mp_"+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem("mp_"+k,JSON.stringify(v))}catch(e){}}};
+const byId=id=>P.find(p=>p.id===id);
+const buyable=p=>p.price>0&&p.stock!==0;
+const waLink=t=>`https://wa.me/${C.whatsapp}?text=${encodeURIComponent(t)}`;
+const priceTxt=p=>p.price?money(p.price):"Price on request";
+const CATS=[["all","View All"],["best","Best Sellers"],["new","New Arrivals"],["sarees","Vintage Sarees"],["jewellery","Handmade Jewellery"]];
+const inCat=(p,c)=>c==="all"||(c==="best"?COL.best.includes(p.id):c==="new"?COL.new.includes(p.id):p.cat===c);
+
+/* ---------- media ---------- */
+function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=4":null,photos}}
+const hasPic=p=>{const m=media(p);return !!(m.cut||m.photos.length)};
+const MARK='<img src="images/peacock.png" alt="" aria-hidden="true">';
+function thumbHTML(p){const m=media(p);return m.cut?`<img src="${m.cut}" alt="${esc(p.name)}">`:m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
+
+/* ---------- icons ---------- */
+const I={
+ search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+ user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg>',
+ bm:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',
+ bag:'<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+ menu:'<svg viewBox="0 0 24 24"><path d="M3 9h18M3 15h12"/></svg>',
+ x:'<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>',
+ home:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>',
+ film:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 12h4M3 16h4M17 8h4M17 12h4M17 16h4"/></svg>',
+ grid:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>',
+ filt:'<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
+ truck:'<svg viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>',
+ up:'<svg viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg>',
+ ig:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/></svg>',
+ wa:'<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z"/><path d="M9 8.5c0 3 3 6 6 6l1-1.4-2-1-1 .7c-1-.4-1.8-1.2-2.2-2.2l.7-1-1-2z"/></svg>',
+ mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>'
 };
-const byId = id => P.find(p=>p.id===id);
-const buyable = p => p.price>0 && p.stock!==0;
-const stockText = p => p.stock===0?"Sold out": p.price===0?"Price on request": p.stock==null?"Available": (p.stock<=3?`Only ${p.stock} left`:"In stock");
-const waLink = t => `https://wa.me/${C.whatsapp}?text=${encodeURIComponent(t)}`;
+const WAFAB='<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.3z"/></svg>';
 
 /* ---------- state ---------- */
-let cart = store.get("cart",[]), wish = store.get("wish",[]);
-const saveCart=()=>{store.set("cart",cart);updateBadges()};
-function addToCart(id,q=1){
-  const p=byId(id); if(!p||!buyable(p)) return toast("This piece is available on request via WhatsApp");
-  const it=cart.find(i=>i.id===id); const max=p.stock==null?99:p.stock;
-  if(it) it.qty=Math.min(max,it.qty+q); else cart.push({id,qty:Math.min(max,q)});
-  saveCart(); toast(p.name+" added to your bag");
-}
-function toggleWish(id){wish=wish.includes(id)?wish.filter(w=>w!==id):[...wish,id];store.set("wish",wish);updateBadges();$$(`.heart[data-id="${id}"]`).forEach(h=>h.classList.toggle("on",wish.includes(id)))}
-function updateBadges(){
-  const n=cart.reduce((a,i)=>a+i.qty,0);
-  $$("[data-badge=cart]").forEach(b=>{b.textContent=n;b.dataset.n=n});
-  $$("[data-badge=wish]").forEach(b=>{b.textContent=wish.length;b.dataset.n=wish.length});
-}
-function toast(m){let t=$(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}
-  t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600)}
+let cart=store.get("cart",[]),wish=store.get("wish",[]);
+const saveCart=()=>{store.set("cart",cart);badges()};
+function badges(){const n=cart.reduce((a,i)=>a+i.qty,0);$$("[data-cart-n]").forEach(b=>b.textContent="("+n+")");$$("[data-wish-dot]").forEach(d=>d.classList.toggle("on",wish.length>0))}
+function toast(m){let t=$(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2400)}
+function addToCart(id,q=1,open=true){const p=byId(id);if(!p||!buyable(p)){toast("Ask us on WhatsApp for this piece");return false}
+ const it=cart.find(i=>i.id===id),max=p.stock==null?99:p.stock;if(it)it.qty=Math.min(max,it.qty+q);else cart.push({id,qty:Math.min(max,q)});saveCart();if(open)openDrawer("cart");else toast("Added to bag");return true}
+function toggleWish(id){wish=wish.includes(id)?wish.filter(w=>w!==id):[...wish,id];store.set("wish",wish);badges();$$(`[data-wish="${id}"]`).forEach(b=>b.classList.toggle("on",wish.includes(id)));toast(wish.includes(id)?"Saved":"Removed from saved")}
+const lines=()=>cart.map(i=>({p:byId(i.id),qty:i.qty})).filter(x=>x.p);
+const totals=()=>{const sub=lines().reduce((a,x)=>a+x.p.price*x.qty,0);const ship=sub?C.shippingFee:0;return{sub,ship,total:sub+ship}};
 
-/* ---------- reusable bits ---------- */
-const CUT={"noor-e-afshan":["white-sofa","#d3c0a2"],"mango-cotton":["mustard-garden","#8a5a37"],"lavender-dream":["purple-brick","#2c2724"],"azure-elegance":["blue-brick","#b9a083"],"maroon-formal":["red-arch","#a0643f"],"green-chiffon-banarsi":["green-lamp","#d2c4aa"]};
-const ph = (p,i=0,cls="")=>{
-  if(i===0&&CUT[p.id]&&!cls.includes("raw")) return `<div class="ph cutph ${cls}" style="--tb:${CUT[p.id][1]}"><img class="cut" src="images/cut/${CUT[p.id][0]}.png?v=2" alt="${esc(p.name)}" loading="lazy"></div>`;
-  const src=`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`;
-  const lum=(h=>{const n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255})(p.c1||"#888888");
-  return `<div class="ph ${lum>.62?"lt ":""}${cls}" style="--c1:${p.c1};--c2:${p.c2}"><span>${esc(p.name)}</span><img src="${src}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()"></div>`;
-};
-const slot = (name,label,c1="#8d9b5a",c2="#e4e8c4",cls="")=>`<div class="ph ${cls}" style="--c1:${c1};--c2:${c2}"><span>${label}</span><img src="images/${name}" alt="${esc(label)}" onerror="this.remove()"></div>`;
-const heartSvg='<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6c-2.3 4.400-9.300 9-9.300 9z"/></svg>';
-const card = p => `<a class="card-p rv" href="product.html?id=${p.id}" aria-label="${esc(p.name)}">
-  <button class="heart ${wish.includes(p.id)?"on":""}" data-id="${p.id}" aria-label="Wishlist" onclick="event.preventDefault();event.stopPropagation();MP.wish('${p.id}')">${heartSvg}</button>
-  ${p.stock===0?'<span class="tag">Sold out</span>':p.price===0?'<span class="tag">On request</span>':""}
-  ${ph(p)}<div class="meta"><div><h3>${esc(p.name)}</h3><div class="sub">${esc(p.sub)}</div></div><div class="price">${p.price?money(p.price):"On request"}</div></div></a>`;
+/* ---------- account (kept on this device only) ---------- */
+async function hash(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+const users=()=>store.get("users",[]);const me=()=>{const e=store.get("session",null);return users().find(u=>u.email===e)||null};
 
-const ic={
-  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>',
-  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.500 4.500-6 8-6s7 1.500 8 6"/></svg>',
-  heart:heartSvg,
-  bag:'<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>',
-  menu:'<svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg>'
-};
+/* ---------- product card ---------- */
+function card(p){
+ const m=media(p);let img;
+ if(m.cut)img=`<img class="cut" src="${m.cut}" alt="${esc(p.name)}" loading="lazy">${m.photos[1]?`<img class="alt" src="${m.photos[1]}" alt="" loading="lazy">`:m.photos[0]?`<img class="alt" src="${m.photos[0]}" alt="" loading="lazy">`:""}`;
+ else if(m.photos[0])img=`<img class="cover" src="${m.photos[0]}" alt="${esc(p.name)}" loading="lazy">${m.photos[1]?`<img class="alt" src="${m.photos[1]}" alt="" loading="lazy">`:""}`;
+ else img=MARK;
+ const tag=p.stock===0?"Sold out":"";
+ return `<article class="pc"><a class="pc-img ${img===MARK?"empty":""}" href="product.html?id=${p.id}" aria-label="${esc(p.name)}">${tag?`<span class="pc-tag">${tag}</span>`:""}${img}</a>
+ <button class="pc-bm ${wish.includes(p.id)?"on":""}" data-wish="${p.id}" aria-label="Save ${esc(p.name)}">${I.bm}</button>
+ <div class="pc-meta"><div><a class="pc-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="pc-p">${priceTxt(p)}</div></div><button class="pc-add" data-add="${p.id}" aria-label="${buyable(p)?"Add to bag":"View"}">+</button></div></article>`}
 
-function header(){
-  const pg=document.body.dataset.page;
-  const on=(...k)=>k.includes(pg)?"on":"";
-  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-<linearGradient id="pfg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8a6a2b"/><stop offset=".35" stop-color="#2f8a4a"/><stop offset="1" stop-color="#0f6b6f"/></linearGradient>
-<radialGradient id="pfe" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0a1d3a"/><stop offset=".3" stop-color="#0f8f9c"/><stop offset=".62" stop-color="#1b4fa0"/><stop offset="1" stop-color="#1f7a5a"/></radialGradient>
-<symbol id="pfeather" viewBox="0 0 100 300">
-<path d="M50 292C6 214 -2 112 50 8C102 112 94 214 50 292Z" fill="url(#pfg)" opacity=".92"/>
-<g fill="none" stroke="#e3c98a" stroke-width=".9" stroke-linecap="round" opacity=".8"><path d="M50 262.0C45.4 258.8 41.7 250.8 40.8 246.0M50 262.0C54.6 258.8 58.3 250.8 59.2 246.0"/><path d="M50 257.3C44.3 254.1 39.7 246.0 38.5 241.2M50 257.3C55.7 254.1 60.3 246.0 61.5 241.2"/><path d="M50 252.6C43.1 249.4 37.7 241.2 36.3 236.4M50 252.6C56.9 249.4 62.3 241.2 63.7 236.4"/><path d="M50 247.9C42.0 244.6 35.7 236.4 34.1 231.5M50 247.9C58.0 244.6 64.3 236.4 65.9 231.5"/><path d="M50 243.2C41.0 239.9 33.7 231.7 31.9 226.7M50 243.2C59.0 239.9 66.3 231.7 68.1 226.7"/><path d="M50 238.5C39.9 235.2 31.8 226.9 29.8 221.9M50 238.5C60.1 235.2 68.2 226.9 70.2 221.9"/><path d="M50 233.8C38.9 230.5 29.9 222.1 27.7 217.1M50 233.8C61.1 230.5 70.1 222.1 72.3 217.1"/><path d="M50 229.1C37.8 225.7 28.1 217.3 25.7 212.3M50 229.1C62.2 225.7 71.9 217.3 74.3 212.3"/><path d="M50 224.4C36.9 221.0 26.4 212.5 23.7 207.4M50 224.4C63.1 221.0 73.6 212.5 76.3 207.4"/><path d="M50 219.7C35.9 216.3 24.7 207.7 21.9 202.6M50 219.7C64.1 216.3 75.3 207.7 78.1 202.6"/><path d="M50 215.0C35.0 211.6 23.1 203.0 20.1 197.8M50 215.0C65.0 211.6 76.9 203.0 79.9 197.8"/><path d="M50 210.3C34.2 206.8 21.6 198.2 18.4 193.0M50 210.3C65.8 206.8 78.4 198.2 81.6 193.0"/><path d="M50 205.6C33.4 202.1 20.1 193.4 16.8 188.2M50 205.6C66.6 202.1 79.9 193.4 83.2 188.2"/><path d="M50 200.9C32.7 197.4 18.8 188.6 15.3 183.3M50 200.9C67.3 197.4 81.2 188.6 84.7 183.3"/><path d="M50 196.2C32.0 192.7 17.6 183.8 14.0 178.5M50 196.2C68.0 192.7 82.4 183.8 86.0 178.5"/><path d="M50 191.5C31.4 187.9 16.5 179.0 12.8 173.7M50 191.5C68.6 187.9 83.5 179.0 87.2 173.7"/><path d="M50 186.8C30.8 183.2 15.5 174.3 11.7 168.9M50 186.8C69.2 183.2 84.5 174.3 88.3 168.9"/><path d="M50 182.1C30.4 178.5 14.6 169.5 10.7 164.1M50 182.1C69.6 178.5 85.4 169.5 89.3 164.1"/><path d="M50 177.4C29.9 173.8 13.9 164.7 9.9 159.2M50 177.4C70.1 173.8 86.1 164.7 90.1 159.2"/><path d="M50 172.7C29.6 169.0 13.3 159.9 9.2 154.4M50 172.7C70.4 169.0 86.7 159.9 90.8 154.4"/><path d="M50 168.0C29.3 164.3 12.8 155.1 8.7 149.6M50 168.0C70.7 164.3 87.2 155.1 91.3 149.6"/><path d="M50 163.3C29.2 159.6 12.5 150.3 8.3 144.8M50 163.3C70.8 159.6 87.5 150.3 91.7 144.8"/><path d="M50 158.6C29.0 154.9 12.3 145.6 8.1 140.0M50 158.6C71.0 154.9 87.7 145.6 91.9 140.0"/><path d="M50 153.9C29.0 150.1 12.2 140.8 8.0 135.1M50 153.9C71.0 150.1 87.8 140.8 92.0 135.1"/><path d="M50 149.2C29.0 145.4 12.3 136.0 8.1 130.3M50 149.2C71.0 145.4 87.7 136.0 91.9 130.3"/><path d="M50 144.5C29.2 140.7 12.5 131.2 8.3 125.5M50 144.5C70.8 140.7 87.5 131.2 91.7 125.5"/><path d="M50 139.8C29.3 136.0 12.8 126.4 8.7 120.7M50 139.8C70.7 136.0 87.2 126.4 91.3 120.7"/><path d="M50 135.1C29.6 131.3 13.3 121.6 9.2 115.9M50 135.1C70.4 131.3 86.7 121.6 90.8 115.9"/><path d="M50 130.4C29.9 126.5 13.9 116.8 9.9 111.0M50 130.4C70.1 126.5 86.1 116.8 90.1 111.0"/><path d="M50 125.7C30.4 121.8 14.6 112.1 10.7 106.2M50 125.7C69.6 121.8 85.4 112.1 89.3 106.2"/><path d="M50 121.0C30.8 117.1 15.5 107.3 11.7 101.4M50 121.0C69.2 117.1 84.5 107.3 88.3 101.4"/><path d="M50 116.3C31.4 112.4 16.5 102.5 12.8 96.6M50 116.3C68.6 112.4 83.5 102.5 87.2 96.6"/><path d="M50 111.6C32.0 107.6 17.6 97.7 14.0 91.8M50 111.6C68.0 107.6 82.4 97.7 86.0 91.8"/><path d="M50 106.9C32.7 102.9 18.8 92.9 15.3 86.9M50 106.9C67.3 102.9 81.2 92.9 84.7 86.9"/><path d="M50 102.2C33.4 98.2 20.1 88.1 16.8 82.1M50 102.2C66.6 98.2 79.9 88.1 83.2 82.1"/><path d="M50 97.5C34.2 93.5 21.6 83.4 18.4 77.3M50 97.5C65.8 93.5 78.4 83.4 81.6 77.3"/><path d="M50 92.8C35.0 88.7 23.1 78.6 20.1 72.5M50 92.8C65.0 88.7 76.9 78.6 79.9 72.5"/><path d="M50 88.1C35.9 84.0 24.7 73.8 21.9 67.7M50 88.1C64.1 84.0 75.3 73.8 78.1 67.7"/><path d="M50 83.4C36.9 79.3 26.4 69.0 23.7 62.8M50 83.4C63.1 79.3 73.6 69.0 76.3 62.8"/><path d="M50 78.7C37.8 74.6 28.1 64.2 25.7 58.0M50 78.7C62.2 74.6 71.9 64.2 74.3 58.0"/><path d="M50 74.0C38.9 69.8 29.9 59.4 27.7 53.2M50 74.0C61.1 69.8 70.1 59.4 72.3 53.2"/><path d="M50 69.3C39.9 65.1 31.8 54.7 29.8 48.4M50 69.3C60.1 65.1 68.2 54.7 70.2 48.4"/><path d="M50 64.6C41.0 60.4 33.7 49.9 31.9 43.6M50 64.6C59.0 60.4 66.3 49.9 68.1 43.6"/><path d="M50 59.9C42.0 55.7 35.7 45.1 34.1 38.7M50 59.9C58.0 55.7 64.3 45.1 65.9 38.7"/><path d="M50 55.2C43.1 50.9 37.7 40.3 36.3 33.9M50 55.2C56.9 50.9 62.3 40.3 63.7 33.9"/><path d="M50 50.5C44.3 46.2 39.7 35.5 38.5 29.1M50 50.5C55.7 46.2 60.3 35.5 61.5 29.1"/></g>
-<path d="M50 296V70" stroke="#6b4f1a" stroke-width="2" stroke-linecap="round"/>
-<ellipse cx="50" cy="92" rx="27" ry="40" fill="#c9a45b"/>
-<ellipse cx="50" cy="92" rx="21.5" ry="33" fill="#1f7a5a"/>
-<ellipse cx="50" cy="92" rx="16" ry="25" fill="url(#pfe)"/>
-<ellipse cx="50" cy="89" rx="8" ry="13" fill="#0f8f9c"/>
-<ellipse cx="50" cy="87" rx="4.2" ry="7" fill="#0a1d3a"/>
-<ellipse cx="48.5" cy="84" rx="1.4" ry="2.2" fill="#9fe3ea" opacity=".8"/>
-</symbol></defs></svg><a class="skip" href="#app">Skip to content</a>
-  <header class="site" id="hdr">
-    <a class="logo" href="index.html" aria-label="Moorpankh home"><img src="images/logo.png" alt="" onload="this.parentNode.classList.add('has-logo')" onerror="this.remove()"><span class="wm">Moorpankh</span></a>
-    <nav class="main" id="nav" aria-label="Main">
-      <a href="index.html" class="${on('home')}">Home</a><a href="shop.html" class="${on('shop')}">Shop</a><a href="sarees.html" class="${on('sarees')}">Sarees</a>
-      <a href="jewellery.html" class="${on('jewellery')}">Jewellery</a><a href="collections.html" class="${on('collections')}">Collections</a>
-      <a href="story.html" class="${on('story','journal')}">Our Story</a></nav>
-    <div class="icons"><a class="btn shopnow" href="shop.html">Shop Now →</a>
-      <button class="ibtn" id="sbtn" aria-label="Search">${ic.search}</button>
-      <a class="ibtn hide-m" href="contact.html" aria-label="Account / contact">${ic.user}</a>
-      <a class="ibtn hide-m" href="wishlist.html" aria-label="Wishlist">${ic.heart}<i class="badge" data-badge="wish"></i></a>
-      <a class="ibtn" href="cart.html" aria-label="Shopping bag">${ic.bag}<i class="badge" data-badge="cart"></i></a>
-      <button class="ibtn burger" id="bg" aria-label="Menu">${ic.menu}</button>
-    </div></header>
-  <div id="search" role="dialog" aria-label="Search"><button class="btn ghost x" id="sx">Close</button><input id="sq" placeholder="Search the collection…" aria-label="Search"><div class="res" id="sr"></div></div>`;
-}
+/* ---------- chrome ---------- */
+const pg=document.body.dataset.page;
+const NAV={home:"home",collections:"collections",sarees:"collections",jewellery:"collections",shop:"collections",product:"collections",about:"about"};
+function chrome(){
+ const on=k=>NAV[pg]===k?"on":"";
+ return `<a class="skip" href="#app">Skip to content</a>
+ <header class="hd" id="hd">
+  <button class="hd-menu" id="menuBtn" aria-label="Open Menu">${I.menu}</button>
+  <a class="hd-logo" href="index.html" aria-label="Moorpankh home"><img class="l-dark" src="images/logo.png" alt="Moorpankh"><img class="l-light" src="images/logo-light.png" alt=""></a>
+  <nav class="hd-nav" aria-label="Main"><a href="index.html" class="${on("home")}">The Lookbook</a><a href="collections.html" class="${on("collections")}">Collections</a><a href="about.html" class="${on("about")}">About</a></nav>
+  <div class="hd-ic"><button class="h-search" id="sBtn" aria-label="Search">${I.search}</button><a class="h-user" href="account.html" aria-label="Account">${I.user}</a><a href="wishlist.html" aria-label="Saved pieces">${I.bm}<i class="dot" data-wish-dot></i></a><button id="cBtn" aria-label="Open bag">${I.bag}<b data-cart-n>(0)</b></button></div>
+ </header>
+ <div class="scrim" id="scrim"></div>
+ <aside class="drw left" id="dMenu" aria-label="Menu"><div class="drw-h" style="background:none;height:76px"><span class="up" style="color:var(--mute);font-size:9.5px">Index</span><button class="drw-x" data-close aria-label="Close Menu" style="margin-left:auto">${I.x}</button></div>
+  <div class="drw-b" style="padding-top:6px"><ul>${[["View All","collections.html"],["Best Sellers","collections.html?cat=best"],["New Arrivals","collections.html?cat=new"],["Vintage Sarees","collections.html?cat=sarees"],["Handmade Jewellery","collections.html?cat=jewellery"],["Login / Account","account.html"],["About","about.html"]].map((m,i)=>`<li><a href="${m[1]}" style="display:flex;gap:16px;align-items:baseline;padding:11px 0;font:500 14px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:#4d4943"><small style="font-size:8px;color:#b5b0a7;letter-spacing:.1em">0${i+1}</small>${m[0]}</a></li>`).join("")}</ul></div>
+  <div class="drw-f" style="border:0"><div class="ft-soc"><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a><a href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="mailto:${C.email}" aria-label="Email">${I.mail}</a></div><small style="color:#b5b0a7;font-size:8px;letter-spacing:.2em;text-transform:uppercase">© ${new Date().getFullYear()} Moorpankh</small></div></aside>
+ <aside class="drw" id="dCart" aria-label="Your cart"><div class="drw-h"><button class="drw-x" data-close aria-label="Close">${I.x}</button><h3>Your Cart</h3></div><div class="drw-b" id="cartBody"></div><div class="drw-f" id="cartFoot"></div></aside>
+ <div class="srch" id="srch" role="dialog" aria-label="Search"><div class="srch-row"><div class="srch-in"><input id="sq" placeholder="Search here..." aria-label="Search" autocomplete="off">${I.search}</div><button class="drw-x" data-close aria-label="Close search">${I.x}</button></div><div id="sBody"></div></div>
+ <nav class="mnav" aria-label="Quick"><a href="index.html" class="${pg==="home"?"on":""}" aria-label="Home">${I.home}</a><button id="sBtn2" aria-label="Search">${I.search}</button><a href="account.html" class="${pg==="account"?"on":""}" aria-label="Account">${I.user}</a><a href="collections.html" class="${NAV[pg]==="collections"?"on":""}" aria-label="Collections">${I.film}</a></nav>`}
 function footer(){
-  return `<footer class="site"><div class="cols">
-   <div><a class="logo foot-logo" href="index.html" aria-label="Moorpankh"><img src="images/logo.png" alt="Moorpankh"></a><p style="max-width:34ch;margin-top:14px">Vintage sarees and handmade jewellery — heritage, craftsmanship and timeless elegance from ${C.city}.</p></div>
-   <div><h4>Shop</h4><ul><li><a href="shop.html">All pieces</a></li><li><a href="sarees.html">Vintage sarees</a></li><li><a href="shop.html?cat=suits">Ready to wear</a></li><li><a href="jewellery.html">Jewellery</a></li><li><a href="collections.html">Collections</a></li></ul></div>
-   <div><h4>Support</h4><ul><li><a href="shipping.html">Shipping &amp; returns</a></li><li><a href="faq.html">FAQs</a></li><li><a href="contact.html">Contact</a></li><li><a href="journal.html">Journal</a></li><li><a href="story.html">Our story</a></li></ul></div>
-   <div><h4>Connect</h4><ul><li><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">Instagram @${C.instagram}</a></li><li><a href="${waLink('Hello Moorpankh!')}" target="_blank" rel="noopener">WhatsApp</a></li><li>${C.email}</li></ul></div>
-  </div><div class="copy"><span>© ${new Date().getFullYear()} Moorpankh. All rights reserved.</span><span>Delivery across Pakistan · ${C.deliveryEstimate}</span></div></footer>
-  <a class="wa-float" href="${waLink('Hello Moorpankh! I would like some help.')}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.600 15L2 22l5.200-1.400A10 10 0 1 0 12 2zm5.200 14.100c-.2.600-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.200-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.9 2.100c.1.200.1.400 0 .5l-.4.600c-.1.200-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.4.100.6-.1l.8-1c.2-.3.400-.2.600-.1l2 1c.3.100.5.200.5.300.1.200.1.800-.1 1.300z"/></svg></a>`;
-}
+ return `<footer class="ft"><div class="ft-g"><div><h6>Inner Circle</h6><form class="ft-news" id="nf"><input type="email" required placeholder="Email" aria-label="Email"><button aria-label="Subscribe">→</button></form><h6>Customer Support</h6><div class="ft-soc"><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a><a href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="mailto:${C.email}" aria-label="Email">${I.mail}</a></div></div>
+ <div><h6>Editorial</h6><ul><li><a href="index.html">The Lookbook</a></li><li><a href="about.html">About Us</a></li><li><a href="account.html">My Account</a></li><li><a href="account.html#orders">Order History</a></li></ul></div>
+ <div><h6>Curations</h6><ul><li><a href="collections.html">All Products</a></li><li><a href="collections.html?cat=sarees">Vintage Sarees</a></li><li><a href="collections.html?cat=jewellery">Handmade Jewellery</a></li><li><a href="collections.html?cat=new">New Arrivals</a></li></ul></div>
+ <div><h6>Assistance</h6><ul><li><a href="shipping.html">Shipping &amp; Returns</a></li><li><a href="faq.html">FAQs</a></li><li><a href="contact.html">Contact</a></li><li><a href="wishlist.html">Saved Pieces</a></li></ul></div></div>
+ <img class="ft-mark" src="images/logo-light.png" alt=""><div class="ft-c">© ${new Date().getFullYear()} Moorpankh · ${C.city}</div></footer>
+ <a class="wa-fab" href="${waLink("Hello Moorpankh! I would like some help.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${WAFAB}</a><button class="totop" id="toTop" aria-label="Back to top">${I.up}</button>`}
+
+/* ---------- drawers ---------- */
+function openDrawer(k){const map={cart:"#dCart",menu:"#dMenu",search:"#srch"};closeAll();if(k==="cart")renderCart();$(map[k]).classList.add("on");$("#scrim").classList.add("on");if(k==="search")setTimeout(()=>$("#sq").focus(),350)}
+function closeAll(){$$(".drw.on,.srch.on,.scrim.on").forEach(e=>e.classList.remove("on"))}
+function renderCart(){const L=lines();const b=$("#cartBody"),f=$("#cartFoot");
+ b.innerHTML=L.length?L.map(({p,qty})=>{const m=media(p);return `<div class="ci"><a class="ci-i ${m.cut||m.photos[0]?"":"ph"}" href="product.html?id=${p.id}">${thumbHTML(p)}</a><div><a class="ci-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="ci-p">${money(p.price)}</div><div class="qty"><button data-q="-" data-id="${p.id}" aria-label="Less">−</button><span>${qty}</span><button data-q="+" data-id="${p.id}" aria-label="More">+</button></div></div><div class="ci-r">${money(p.price*qty)}<button data-rm="${p.id}">Remove</button></div></div>`}).join(""):`<div class="cart-empty">${I.bag}Your bag is empty.</div>`;
+ const t=totals();f.innerHTML=L.length?`<div class="tot"><span>Subtotal</span><span>${money(t.sub)}</span></div><small style="color:var(--mute);font-size:11px">Delivery: ${C.deliveryEstimate}. Cash on Delivery across Pakistan.</small><a class="btn pill" href="checkout.html">Checkout</a><a class="btn pill out" href="cart.html">View bag</a>`:`<a class="btn pill" href="collections.html">Continue shopping</a>`}
+
+/* ---------- search ---------- */
+const catThumb={best:"images/cut/red-arch.png",new:"images/cut/green-lamp.png",sarees:"images/cut/purple-brick.png",jewellery:"images/products/ethnic-bangles.jpg"};
+function renderSearch(q){const body=$("#sBody");q=q.trim().toLowerCase();
+ if(!q){body.innerHTML=`<h5>Collections</h5><div class="cc">${CATS.slice(1).map(c=>`<a href="collections.html?cat=${c[0]}"><div class="t"><img class="${c[0]==="jewellery"?"cv":""}" src="${catThumb[c[0]]}" alt=""></div><span>${c[1]}</span></a>`).join("")}</div>`;return}
+ const r=P.filter(p=>(p.name+" "+p.sub+" "+p.cat+" "+p.desc).toLowerCase().includes(q));
+ body.innerHTML=`<h5>${r.length} result${r.length===1?"":"s"}</h5>${r.length?`<div class="sres">${r.map(p=>card(p)).join("")}</div>`:`<p class="empty" style="padding:30px 0">Nothing found. Try “saree”, “banarsi” or “bangles”.</p>`}`}
 
 /* ---------- pages ---------- */
-const pages = {};
-
-pages.home = () => {
-  const I=(f,alt,x="")=>`<img src="images/${f}.jpg" alt="${alt}" ${x}>`;
-  const star='<svg class="tr-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.5 16.5 11.2 24 12 16.5 12.8 12.8 16.5 12 24 11.2 16.5 7.5 12.8 0 12 7.5 11.2 11.2 7.5 12 0Z"/></svg>';
-  const heart='<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6c-2.3 4.4-9.3 9-9.3 9z"/></svg>';
-  const bag='<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>';
-  const band=t=>`<div class="tr-band" aria-hidden="true"><div>${(t+" ").repeat(10)}</div></div>`;
-  const bandText='MOORPANKH <b>✦</b> NEW COLLECTION 2026 <b>✦</b> TRADITION, REDEFINED <b>✦</b>';
-  // product tiles: [id, tile colour, filter tags, cutout?]
-  const tiles=[["noor-e-afshan","#d3c0a2","sarees semi",1],["mango-cotton","#8a5a37","sarees cotton",1],["lavender-dream","#2c2724","sarees blockprint",1],["azure-elegance","#b9a083","sarees blockprint",1],["maroon-formal","#a0643f","sarees banarsi",1],["green-chiffon-banarsi","#d2c4aa","sarees banarsi",1],["ethnic-bangles","#2c2724","jewellery",0],["hair-accessory","#b9a083","jewellery",0]];
-  const cutFile={"noor-e-afshan":"white-sofa","mango-cotton":"mustard-garden","lavender-dream":"purple-brick","azure-elegance":"blue-brick","maroon-formal":"red-arch","green-chiffon-banarsi":"green-lamp"};
-  const tile=([id,bg,tags,cut])=>{const p=byId(id);return `<a class="tr-tile rv" data-f="${tags}" href="product.html?id=${id}"><div class="bg" style="--tb:${bg}"><img class="cover" src="images/products/${id}.jpg?v=hd" alt="${esc(p.name)}" loading="lazy"><span class="ic"><i>${heart}</i><i>${bag}</i></span></div><div class="cap"><b>${esc(p.name)}</b><span>${p.price?money(p.price):"On request"}</span></div></a>`};
-  const faq=[["How long does delivery take?",`Estimated ${C.deliveryEstimate} across Pakistan.`],["Do you offer Cash on Delivery?","Yes, across Pakistan."],["Can I see more photos of a piece?","Message us on WhatsApp and we'll send more pictures."],["How do I pay online?",C.paymentNote]];
-  return `
-  <section class="tr-hero" id="hero" aria-label="Moorpankh">
-    <div class="tr-tag"><i></i>#2026 COLLECTION</div>
-    <img class="tr-feather f1" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f2" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f3" src="images/feather.png?v=1" alt="" aria-hidden="true"><img class="tr-feather f4" src="images/feather.png?v=1" alt="" aria-hidden="true">
-    <div class="tr-hwrap"><h1 class="tr-h1"><span class="ln"><i>Tradition,</i></span><span class="ln"><i>Redefined</i></span></h1>${star.replace('class="tr-star"','class="tr-star s1"')}${star.replace('class="tr-star"','class="tr-star s2"')}</div>
-    <div class="tr-row"><div class="tr-left"><p class="tr-sub">Vintage sarees and handmade jewellery, inspired by timeless South Asian craftsmanship.</p>
-    <div class="tr-stats"><div><b>+${P.length}</b><small>Pieces</small></div><div><b>COD</b><small>Across Pakistan</small></div></div></div>
-    <a class="tr-swatch" href="sarees.html" aria-label="New in"><div class="pic">${I("fabric-2","Silk fabric swirl")}</div><span class="rib">NEW IN</span></a></div>
-    <div class="tr-gold" aria-hidden="true"></div>
-    <img class="tr-model" src="images/cutout-model.png?v=4" alt="Model in a red banarsi saree">
-  </section>
-  ${band(bandText)}
-
-  <section class="tr-about">
-    <div class="tr-ph rv"><div class="pic">${I("model-arch","Models in sarees beneath a heritage arch")}</div></div>
-    <div class="tr-about-t"><h2 class="tr-h2 split-line">Heritage &amp; Collection</h2>
-      <p class="rv">Welcome to Moorpankh, where vintage meets everyday elegance. Based in ${C.city}, we bring together hand block printed, banarsi and cotton sarees with handmade jewellery. Each piece is chosen for its craft and made to be worn for years.</p>
-      <p class="rv"><a class="btn mag" href="story.html">Our Story →</a></p></div>
-  </section>
-
-  <section class="tr-shop" id="shop">
-    <div class="tr-shop-head"><h2 class="tr-h2">For You</h2>
-      <div class="tr-chips" role="tablist">${[["all","All"],["sarees","Sarees"],["jewellery","Jewellery"],["banarsi","Banarsi"],["blockprint","Block Print"],["cotton","Cotton"]].map((c,i)=>`<button class="chip ${i?"":"on"}" data-c="${c[0]}">${c[1]}</button>`).join("")}</div></div>
-    <div class="tr-grid" id="trgrid">${tiles.map(tile).join("")}<a class="tr-tile viewall rv" href="shop.html"><div class="bg dark"><b>View<br>all<br>pieces</b><i class="go">→</i></div></a></div>
-  </section>
-  ${band("NEW COLLECTION 2026 <b>✦</b> TRADITION <b>✦</b> REDEFINED <b>✦</b> MOORPANKH <b>✦</b>")}
-
-  <section class="tr-why"><h2 class="tr-h2 split-line">We are made by hand</h2>
-    <div class="tr-brands">${["Hand block printed","Banarsi weaves","Handmade jewellery","Cash on delivery",C.deliveryEstimate,"Order on WhatsApp"].map(t=>`<div class="rv"><span>${t}</span></div>`).join("")}</div></section>
-
-  <section class="tr-ban"><div class="pic">${I("heritage-2","Red sandstone heritage arcade","data-par")}</div><div class="in"><small>Lahore · Heritage</small><h2 class="tr-h2">Rooted in<br>heritage</h2><a class="btn gold mag" href="collections.html">View Collections →</a></div></section>
-
-  <section class="tr-jew"><div class="tr-shop-head"><h2 class="tr-h2">Handmade<br>Jewellery</h2><a class="btn mag" href="jewellery.html">Shop Jewellery →</a></div>
-    <div class="row3">${[["earrings-peacock","Peacock earrings"],["bangles-hand","Handmade bangles"],["necklace-blue","Cowrie necklace"],["earrings-cowrie","Hand-painted earrings"]].map(j=>`<figure class="rv"><div class="pic"><img src="images/real/${j[0]}.jpg?v=hd" alt="${j[1]}" loading="lazy"></div><figcaption>${j[1]}</figcaption></figure>`).join("")}</div></section>
-
-  <section class="tr-faq"><div><h2 class="tr-h2">Need<br>help?</h2></div><div class="mk-faq">${faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div></section>
-
-  <section class="tr-news"><h2 class="tr-h2">First to see<br>what's new</h2><form id="nf"><input type="email" required placeholder="Your email" aria-label="Email"><button class="btn">Subscribe</button></form></section>`;
-};
-
-const COLLECTIONS = {
-  banarsi:{title:"Banarsi & Formal",c1:"#5a1020",c2:"#c9a24b",test:p=>p.sub==="Banarsi"||p.sub==="Semi Formal",text:"Heavy chiffon and formal banarsi sarees for weddings and occasions."},
-  blockprint:{title:"Hand Block Printed",c1:"#4c3a86",c2:"#cfe6fb",test:p=>p.sub==="Hand Block Printed",text:"Lavender Dream, Azure Elegance — printed by hand."},
-  frida:{title:"Frida Kahlo Edit",c1:"#2f3b2a",c2:"#c8402a",test:p=>/frida|viva/i.test(p.name),text:"Art-inspired digital print sarees."},
-  cotton:{title:"Cotton, Lawn & Summer",c1:"#e9a817",c2:"#f3efe6",test:p=>["Cotton","Lawn","Summer","Daily Wear"].includes(p.sub),text:"Light, breathable pieces for everyday elegance."},
-  rtw:{title:"Ready to Wear",c1:"#6a3d33",c2:"#e8c9ce",test:p=>p.cat==="suits",text:"Co-ords, kaftans and 2-piece sets."}
-};
-
-pages.shop = (cat0) => {
-  const q=new URLSearchParams(location.search); let cat=cat0||q.get("cat")||"all";
-  const title={all:"Shop All",sarees:"Vintage Sarees",suits:"Ready to Wear",jewellery:"Handmade Jewellery"}[cat]||"Shop";
-  const tabs=cat0?"":["all","sarees","suits","jewellery"].map(c=>`<button class="chip ${c===cat?"on":""}" data-cat="${c}">${{all:"All",sarees:"Sarees",suits:"Ready to wear",jewellery:"Jewellery"}[c]}</button>`).join("");
-  setTimeout(()=>{
-    const st={cat,sort:"feat",avail:false};
-    const draw=()=>{
-      let l=P.filter(p=>(st.cat==="all"||p.cat===st.cat)&&(!st.avail||buyable(p)));
-      if(st.sort==="lo")l.sort((a,b)=>(a.price||1e9)-(b.price||1e9)); if(st.sort==="hi")l.sort((a,b)=>b.price-a.price);
-      if(st.sort==="az")l.sort((a,b)=>a.name.localeCompare(b.name));
-      $("#pg").innerHTML=l.length?l.map(card).join(""):'<p class="empty">Nothing here yet.</p>'; $("#cnt").textContent=l.length+" pieces"; reveal();
-    };
-    $$(".chip[data-cat]").forEach(b=>b.onclick=()=>{st.cat=b.dataset.cat;$$(".chip[data-cat]").forEach(x=>x.classList.toggle("on",x===b));draw()});
-    $("#sort").onchange=e=>{st.sort=e.target.value;draw()}; $("#av").onchange=e=>{st.avail=e.target.checked;draw()}; draw();
-  });
-  return `<section class="wrap page-top"><p class="eyebrow">Moorpankh</p><h1 class="display" style="font-size:clamp(3rem,9vw,8rem)">${title}</h1></section>
-  <section class="wrap" style="padding-top:20px"><div class="toolbar">${tabs}<label style="display:flex;flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:.9rem"><input type="checkbox" id="av" style="width:auto"> Priced &amp; orderable only</label><span id="cnt" class="eyebrow"></span>
-    <select id="sort" aria-label="Sort"><option value="feat">Featured</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option><option value="az">Name A–Z</option></select></div><div class="grid" id="pg"></div></section>`;
-};
-
-pages.collections = () => `<section class="wrap page-top"><p class="eyebrow">Curated</p><h1 class="display" style="font-size:clamp(3rem,9vw,8rem)">Exclusive Collections</h1></section>
- ${Object.entries(COLLECTIONS).map(([k,c])=>{const l=P.filter(c.test);return `<section class="wrap" id="${k}" style="padding-block:50px"><div class="head-row"><div><h2 class="h2">${c.title}</h2><p class="lead" style="margin-top:10px">${c.text}</p></div></div><div class="grid">${l.map(card).join("")}</div></section>`}).join("")}`;
-
-pages.product = () => {
-  const id=new URLSearchParams(location.search).get("id"); const p=byId(id);
-  if(!p) return `<section class="wrap page-top"><h1 class="h2">Piece not found</h1><p><a class="link" href="shop.html">Back to shop</a></p></section>`;
-  document.title=p.name+" — Moorpankh";
-  const rel=P.filter(x=>x.cat===p.cat&&x.id!==p.id).slice(0,4);
-  setTimeout(()=>{
-    let q=1; const set=()=>$("#q").textContent=q;
-    $("#qm").onclick=()=>{q=Math.max(1,q-1);set()}; $("#qp").onclick=()=>{q=Math.min(p.stock||99,q+1);set()};
-    const ab=$("#add"); if(ab){ab.onclick=()=>addToCart(p.id,q); $("#buy").onclick=()=>{addToCart(p.id,q);location.href="checkout.html"}}
-    $("#wl").onclick=()=>{toggleWish(p.id);$("#wl").textContent=wish.includes(p.id)?"♥ In wishlist":"♡ Wishlist"};
-    const z=$(".zoom"); z.onclick=()=>z.classList.toggle("z");
-    z.onmousemove=e=>{if(!z.classList.contains("z"))return;const r=z.getBoundingClientRect();z.firstElementChild.style.transformOrigin=`${(e.clientX-r.left)/r.width*100}% ${(e.clientY-r.top)/r.height*100}%`};
-    $$(".thumbs .ph").forEach((t,i)=>{if(i>0){const im=t.querySelector("img");if(!im){t.remove();return}im.addEventListener("error",()=>t.remove());setTimeout(()=>{if(!im.complete||!im.naturalWidth)t.remove()},1500)}});
-    $$(".thumbs .ph").forEach((t,i)=>t.onclick=()=>{$$(".thumbs .ph").forEach(x=>x.classList.toggle("on",x===t));z.innerHTML=ph(p,i,"raw");gsapIn(z)});
-  });
-  const orderMsg=`Hello Moorpankh! I'd like to order / enquire about: ${p.name}${p.price?" ("+money(p.price)+")":""}. ${location.href}`;
-  return `<section class="wrap pdp"><div class="gal"><div class="thumbs">${[0,1,2].map(i=>ph(p,i,i?"raw":"raw on")).join("")}</div><div class="zoom" aria-label="Zoom image">${ph(p,0,"raw")}</div></div>
-   <div><p class="eyebrow">${esc(p.sub)} · ${{sarees:"Vintage Saree",suits:"Ready to wear",jewellery:"Jewellery"}[p.cat]}</p><h1>${esc(p.name)}</h1>
-   <div class="pr">${p.price?money(p.price):"Price on request"}</div><span class="stock ${p.stock===0?"out":""}">${stockText(p)}</span>
-   <p class="lead">${esc(p.desc)}</p>
-   ${buyable(p)?`<div style="margin-top:24px"><div class="qty"><button id="qm" aria-label="Less">−</button><span id="q">1</span><button id="qp" aria-label="More">+</button></div></div>
-   <div class="act"><button class="btn mag" id="add">Add to bag</button><button class="btn ghost mag" id="buy">Buy now</button></div>`:
-   `<div class="act"><a class="btn wa mag" href="${waLink(orderMsg)}" target="_blank" rel="noopener">${p.stock===0?"Ask about restock":"Enquire on WhatsApp"}</a></div>`}
-   <div class="act" style="margin-top:0"><button class="link" id="wl">${wish.includes(p.id)?"♥ In wishlist":"♡ Wishlist"}</button><a class="link" href="${waLink(orderMsg)}" target="_blank" rel="noopener">Order via WhatsApp</a></div>
-   <div class="facts"><details open><summary>Details</summary><p>${esc(p.desc)} Sizes and variations are confirmed on WhatsApp.</p></details>
-   <details><summary>Delivery</summary><p>Cash on Delivery across Pakistan. Estimated ${C.deliveryEstimate}.</p></details>
-   <details><summary>Care &amp; returns</summary><p>See our <a class="link" href="shipping.html">shipping &amp; returns</a> policy.</p></details></div></div></section>
-   <section class="wrap"><div class="head-row"><h2 class="h2">You may also love</h2></div><div class="grid">${rel.map(card).join("")}</div></section>`;
-};
-
-const lineItems = () => cart.map(i=>({p:byId(i.id),qty:i.qty})).filter(x=>x.p);
-const totals = () => {const sub=lineItems().reduce((a,x)=>a+x.p.price*x.qty,0);return {sub,ship:sub?C.shippingFee:0,total:sub?sub+C.shippingFee:0}};
-const sumHtml = () => {const t=totals();return `<div class="r"><span>Subtotal</span><span>${money(t.sub)}</span></div>${t.ship?`<div class="r"><span>Delivery</span><span>${money(t.ship)}</span></div>`:`<div class="r"><span>Delivery</span><span>Confirmed on WhatsApp</span></div>`}<div class="r t"><span>Total</span><span>${money(t.total)}</span></div>`};
-
-pages.cart = () => {
-  const draw=()=>{
-    const l=lineItems(); const box=$("#cl"); if(!box)return;
-    box.innerHTML=l.length?l.map(({p,qty})=>`<div class="cart-row">${ph(p)}<div><h3>${esc(p.name)}</h3><div class="sub">${money(p.price)}</div></div>
-      <div class="qty"><button data-a="m" data-id="${p.id}" aria-label="Less">−</button><span>${qty}</span><button data-a="p" data-id="${p.id}" aria-label="More">+</button></div>
-      <div><div class="price">${money(p.price*qty)}</div><button class="link" data-a="r" data-id="${p.id}">Remove</button></div></div>`).join(""):`<p class="empty">Your bag is empty. <a class="link" href="shop.html">Continue shopping</a></p>`;
-    $("#cs").innerHTML=sumHtml(); $("#co").style.display=l.length?"":"none";
-  };
-  setTimeout(()=>{draw();$("#cl").onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;const it=cart.find(i=>i.id===b.dataset.id),p=byId(b.dataset.id);
-    if(b.dataset.a==="p")it.qty=Math.min(p.stock||99,it.qty+1);if(b.dataset.a==="m")it.qty=Math.max(1,it.qty-1);if(b.dataset.a==="r")cart=cart.filter(i=>i!==it);saveCart();draw()}});
-  return `<section class="wrap page-top"><h1 class="display" style="font-size:clamp(3rem,9vw,8rem)">Your Bag</h1></section>
-  <section class="wrap" style="padding-top:20px"><div class="two"><div id="cl"></div><aside class="sum"><h3 style="font-size:1.8rem;margin-bottom:10px">Summary</h3><div id="cs"></div><a id="co" class="btn mag" style="width:100%;justify-content:center;margin-top:20px" href="checkout.html">Checkout</a></aside></div></section>`;
-};
-
-pages.wishlist = () => { const l=wish.map(byId).filter(Boolean);
-  return `<section class="wrap page-top"><h1 class="display" style="font-size:clamp(3rem,9vw,8rem)">Wishlist</h1></section><section class="wrap" style="padding-top:20px">${l.length?`<div class="grid">${l.map(card).join("")}</div>`:`<p class="empty">Nothing saved yet. <a class="link" href="shop.html">Explore the collection</a></p>`}</section>`};
-
-pages.checkout = () => {
-  setTimeout(()=>{
-    const f=$("#cf"); if(!f)return;
-    f.onsubmit=e=>{e.preventDefault(); const l=lineItems(); if(!l.length)return toast("Your bag is empty");
-      const d=Object.fromEntries(new FormData(f)); const t=totals();
-      const order={no:"MP"+Date.now().toString().slice(-7),date:new Date().toISOString(),customer:d,items:l.map(x=>({id:x.p.id,name:x.p.name,price:x.p.price,qty:x.qty})),...t,status:"Pending confirmation"};
-      const all=store.get("orders",[]);all.push(order);store.set("orders",all);
-      const msg=`New Moorpankh order ${order.no}\n\n`+order.items.map(i=>`• ${i.name} × ${i.qty} — ${money(i.price*i.qty)}`).join("\n")+`\n\nTotal: ${money(t.total)}\nPayment: ${d.pay}\n\nName: ${d.name}\nPhone: ${d.phone}\nAddress: ${d.address}, ${d.city}${d.postal?" "+d.postal:""}\n${d.notes?"Notes: "+d.notes:""}`;
-      cart=[];saveCart();
-      $("#app").innerHTML=`<section class="wrap page-top" style="min-height:70vh"><p class="eyebrow">Order received</p><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Thank you, ${esc(d.name.split(" ")[0])}.</h1>
-      <p class="lead" style="margin:20px 0">Your order <b>${order.no}</b> is saved. <b>Please tap the button below to send it to us on WhatsApp</b> — we confirm every order there${d.pay==="Cash on Delivery"?" and you pay on delivery":", along with payment details"}. Estimated delivery: ${C.deliveryEstimate}.</p>
-      <p><a class="btn wa mag" href="${waLink(msg)}" target="_blank" rel="noopener">Send order on WhatsApp</a></p>
-      <p style="margin-top:24px"><a class="link" href="shop.html">Continue shopping</a></p></section>`;window.scrollTo(0,0)};
-    $("#cks").innerHTML=lineItems().map(({p,qty})=>`<div class="r"><span>${esc(p.name)} × ${qty}</span><span>${money(p.price*qty)}</span></div>`).join("")+sumHtml();
-  });
-  return `<section class="wrap page-top"><h1 class="display" style="font-size:clamp(3rem,9vw,8rem)">Checkout</h1></section>
-  <section class="wrap" style="padding-top:20px">${lineItems().length?`<div class="two"><form id="cf" class="form" autocomplete="on"><h3 style="font-size:1.8rem">Delivery details</h3>
-   <div class="g2"><label>Full name<input name="name" required autocomplete="name"></label><label>Phone / WhatsApp<input name="phone" type="tel" required pattern="[0-9+ \\-]{10,15}" autocomplete="tel" placeholder="03XX XXXXXXX"></label></div>
-   <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
-   <label>Street address<textarea name="address" rows="2" required autocomplete="street-address"></textarea></label>
-   <div class="g2"><label>City<input name="city" required autocomplete="address-level2"></label><label>Postal code<input name="postal" autocomplete="postal-code"></label></div>
-   <label>Order notes<textarea name="notes" rows="2"></textarea></label>
-   <h3 style="font-size:1.8rem;margin-top:10px">Payment</h3><div class="pay">
-    <label><input type="radio" name="pay" value="Cash on Delivery" checked><span><b>Cash on Delivery</b><br>Available across Pakistan.</span></label>
-    <label><input type="radio" name="pay" value="Online transfer (JazzCash/Easypaisa/Bank)"><span><b>Online transfer</b><br>${C.paymentNote}</span></label></div>
-   <button class="btn mag" style="justify-content:center">Place order</button><small style="color:var(--muted)">Your details are kept on your device and sent only to Moorpankh via WhatsApp.</small></form>
-   <aside class="sum"><h3 style="font-size:1.8rem;margin-bottom:10px">Your order</h3><div id="cks"></div></aside></div>`:`<p class="empty">Your bag is empty. <a class="link" href="shop.html">Continue shopping</a></p>`}</section>`;
-};
-
-pages.story = () => `<section class="page-top"><p class="eyebrow">Our Story</p><h1 class="display">Timeless, on purpose.</h1></section>
- <section class="wrap intro-s"><div class="photo-pair"><div class="pic rv"><img src="images/model-red.jpg" alt="Woman in a red saree and veil" data-par></div><div class="pic rv" style="margin-top:60px"><img src="images/jewel-2.jpg" alt="Woman in a pink saree and gold jewellery" data-par></div></div>
- <div class="prose"><p class="lead">Moorpankh is a Lahore-based label for vintage sarees, traditional fashion and handmade jewellery.</p><h2>Why the peacock</h2><p>Moorpankh means peacock feather — a symbol of grace and heritage. <em>[Replace with your own founding story.]</em></p><h2>What we believe</h2><p>Wear sustainability. Wear heritage. Pieces made to be kept, not discarded.</p><p><a class="btn mag" href="shop.html">Explore the collection</a></p></div></section>`;
-
-pages.journal = () => `<section class="page-top"><p class="eyebrow">Journal</p><h1 class="display">Editorial</h1></section>
- <section class="wrap"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">${[["How to drape a banarsi saree","Styling","hero-3"],["Hand block printing: a closer look","Craft","fabric-2"],["Mixing vintage jewellery with a plain saree","Jewellery","jewel-1"]].map(a=>`<article class="card-p rv"><div class="pic" style="aspect-ratio:3/4"><img src="images/${a[2]}.jpg" alt="${a[0]}" loading="lazy"></div><div class="meta"><h3>${a[0]}</h3></div><p class="sub">${a[1]} · article coming soon</p></article>`).join("")}</div></section>`;
-
-pages.contact = () => {
-  setTimeout(()=>{const f=$("#ctf");if(f)f.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));window.open(waLink(`Hello Moorpankh, I'm ${d.name} (${d.phone}).\n${d.msg}`),"_blank","noopener");toast("Opening WhatsApp…")}});
-  return `<section class="wrap page-top"><p class="eyebrow">Contact</p><h1 class="display">Say hello.</h1></section>
-  <section class="wrap" style="padding-top:20px"><div class="two"><form id="ctf" class="form"><label>Name<input name="name" required></label><label>Phone<input name="phone" required></label><label>Message<textarea name="msg" rows="5" required></textarea></label><button class="btn mag" style="justify-content:center">Send via WhatsApp</button></form>
-  <div class="prose"><h2 style="margin-top:0">Reach us</h2><p>WhatsApp: <a class="link" href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener">Chat now</a></p><p>Instagram: <a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></p><p>Email: ${C.email}</p><p>${C.city}</p></div></div></section>`;
-};
-
-pages.faq = () => { const q=[["How long does delivery take?",`Estimated ${C.deliveryEstimate} across Pakistan.`],["Do you offer Cash on Delivery?","Yes, across Pakistan."],["Can I see more photos of a piece?","Message us on WhatsApp and we'll send more pictures."],["Some pieces say 'Price on request'. Why?","Those pieces have no listed price yet — message us on WhatsApp for the price and availability."],["Are sarees stitched?","Sarees are unstitched unless stated; ask us about blouse options."],["How do I pay online?",C.paymentNote]];
-  return `<section class="wrap page-top"><p class="eyebrow">Help</p><h1 class="display">FAQs</h1></section><section class="wrap" style="padding-top:20px"><div class="prose facts">${q.map(x=>`<details><summary>${x[0]}</summary><p>${x[1]}</p></details>`).join("")}</div></section>`};
-
-pages.shipping = () => `<section class="wrap page-top"><p class="eyebrow">Policies</p><h1 class="display" style="font-size:clamp(3rem,8vw,7rem)">Shipping &amp; Returns</h1></section>
- <section class="wrap" style="padding-top:20px"><div class="prose"><h2>Delivery</h2><p>We ship across Pakistan from ${C.city}. Estimated delivery: ${C.deliveryEstimate}.</p><h2>Payment</h2><p>Cash on Delivery, or online transfer confirmed on WhatsApp.</p><h2>Exchanges &amp; returns</h2><p><em>[Add your exchange/return policy here — this has not been supplied yet, so none is stated.]</em></p></div></section>`;
-
-/* ---------- animation ---------- */
-const hasG = ()=>!!(window.gsap&&window.ScrollTrigger);
-function gsapIn(el){ if(window.gsap) gsap.from(el,{opacity:0,duration:.5}); }
-function reveal(){
-  if(!hasG()){$$(".rv").forEach(el=>el.style.cssText="opacity:1;transform:none");return}
-  const els=$$(".rv:not(.rb)"); if(!els.length)return; els.forEach(e=>e.classList.add("rb"));
-  ScrollTrigger.batch(els,{start:"top 94%",once:true,onEnter:b=>gsap.to(b,{opacity:1,y:0,duration:1.1,stagger:.1,ease:"power3.out",overwrite:true})});
+const pages={};
+const latest=()=>{const a=[...COL.new,...P.filter(hasPic).map(p=>p.id)];return [...new Set(a)].map(byId).filter(Boolean).slice(0,4)};
+const lookbookItems=()=>P.filter(p=>media(p).cut);
+pages.home=()=>{
+ const L=lookbookItems();
+ const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-hint">Scroll</div></div>
+  <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
+ const mh=`<section class="mh"><div class="mh-hero"><img src="images/hero-3.jpg" alt="Model in a vintage banarsi saree"><a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
+ return mh+lb+`<section class="sec"><div class="sec-h"><h2>Latest Drop</h2><a class="link" href="collections.html?cat=new">Discover more</a></div><div class="grid">${latest().map(p=>card(p)).join("")}</div></section>
+ <div class="sec-cta"><a class="btn" href="collections.html">Shop Now</a></div>`};
+function initLookbook(){
+ const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
+ let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
+ const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
+ function layout(){const H=stage.clientHeight*.76,W=stage.clientWidth;
+  els.forEach((el,i)=>{const d=i-a;let k;
+   if(d===0)k=0;else if(d<0&&d>=-3)k=-d;else k=null;
+   if(k!==null){el.style.height=(H*S[k])+"px";el.style.width=(H*S[k]*.72)+"px";el.style.left=(W*X[k])+"px";el.style.bottom=B[k]+"px";el.style.opacity=O[k];el.style.zIndex=10-k;el.style.pointerEvents=k?"auto":"none";el.style.filter=k>=2?"grayscale(.35)":"none"}
+   else if(d>0){el.style.height=(H*1.06)+"px";el.style.width=(H*1.06*.72)+"px";el.style.left=(W*.92)+"px";el.style.bottom=(B[0]-20)+"px";el.style.opacity=0;el.style.zIndex=11;el.style.pointerEvents="none";el.style.filter="none"}
+   else{el.style.height=(H*.25)+"px";el.style.width=(H*.14)+"px";el.style.left=(W*-.05)+"px";el.style.bottom=B[3]+"px";el.style.opacity=0;el.style.pointerEvents="none"}});
+  $("#lbCount").textContent=String(a+1).padStart(2,"0")+" / "+String(L.length).padStart(2,"0")}
+ function panel(first){const p=L[a],m=media(p),box=$("#lbIn");
+  const fill=()=>{box.innerHTML=`<div class="lb-thumb ${m.cut?"":"ph"}">${thumbHTML(p)}</div><h2 class="lb-n">${esc(p.name)}</h2><p class="lb-d">${esc(p.desc)}</p><div class="lb-p">${priceTxt(p)}</div><a class="btn" href="product.html?id=${p.id}">Shop The Look</a>`;box.classList.remove("out")};
+  if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
+ function go(n){if(busy||n<0||n>=L.length||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
+ layout();panel(true);addEventListener("resize",layout);
+ els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
+ let locked=false,idle=null,lastT=0;
+ addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2)return;
+  const dir=e.deltaY>18?1:e.deltaY<-18?-1:0;if(!dir)return;
+  const can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can)return;   // at either end: let the page scroll normally
+  e.preventDefault();
+  clearTimeout(idle);idle=setTimeout(()=>{if(Date.now()-lastT>600)locked=false},170);   // a flick is over once wheel events pause
+  if(locked)return;locked=true;lastT=Date.now();go(a+dir)},{passive:false});
+ addEventListener("keydown",e=>{if(innerWidth<=900||scrollY>2||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight"||e.key==="ArrowDown")go(a+1);if(e.key==="ArrowLeft"||e.key==="ArrowUp")go(a-1)});
+ let sx=null;stage.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});stage.addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(a+(dx<0?1:-1));sx=null});
 }
-function splitWords(el){
-  if(el.dataset.sp) return; el.dataset.sp=1;
-  el.innerHTML=el.textContent.trim().split(/\s+/).map(w=>`<span class="w"><i>${w}</i></span>`).join(" ");
-}
-function homeHero(startDelay){
-  const urls=["hero-1","hero-3","hero-2","hero-4"].map(n=>`images/${n}.jpg`);
-  const cnt=$("#hc"); let gl=null, timer;
-  const fb=$(".h-fb");
-  const upd=i=>{ if(cnt) cnt.textContent="0"+(i+1) };
-  if(window.MP_GL&&MP_GL.ok()){
-    gl=MP_GL.hero($("#heroGL"),urls,upd);
-    if(gl) fb.style.visibility="hidden";
-  }
-  if(!gl){ // fallback: CSS cross-fade between the same photographs
-    const arch=$("#harch"); const imgs=[fb]; urls.slice(1).forEach(u=>{const im=fb.cloneNode();im.src=u;im.style.opacity=0;arch.appendChild(im);imgs.push(im)}); let c=0;
-    gl={next(){const n=(c+1)%imgs.length;gsap.to(imgs[c],{opacity:0,duration:1.2});gsap.to(imgs[n],{opacity:1,duration:1.2});c=n;upd(n)}};
-  }
-  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  if(!reduce) setTimeout(()=>{ timer=setInterval(()=>{ if(!document.hidden) gl.next() },5200) },startDelay*1000+1500);
-  $("#harch").addEventListener("click",()=>gl.next());
-  // intro timeline
-  const tl=gsap.timeline({delay:startDelay});
-  tl.fromTo(".hero .h-title .ln i",{yPercent:115},{yPercent:0,duration:1.5,ease:"expo.out",stagger:.12},0)
-    .fromTo("#harch",{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:1.7,ease:"expo.inOut"},0.1)
-    .fromTo(".h-side",{opacity:0,y:60},{opacity:1,y:0,duration:1.2,stagger:.15,ease:"power3.out"},0.9)
-    .fromTo(".h-copy,.h-count,.h-cta,.doodle",{opacity:0,y:30},{opacity:1,y:0,duration:1,stagger:.08,ease:"power3.out"},1.2);
-  // scroll drift
-  gsap.to(".h-title .ln:nth-child(1)",{xPercent:-8,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to(".h-title .ln:nth-child(2)",{xPercent:8,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to("#harch",{yPercent:12,scale:1.04,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to(".h-side img",{yPercent:-10,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-}
-function pinned(){
-  const pin=$("#pin"); if(!pin) return;
-  const imgs=$$(".pin-img",pin), words=$$(".pin-word i",pin), subs=["Silhouettes drawn from the arcades and courtyards of the subcontinent.","Zari, banarsi and hand block prints — slow work, made to be kept.","The quiet confidence of a saree worn well."];
-  gsap.set(imgs.slice(1),{clipPath:"inset(100% 0% 0% 0%)"}); gsap.set(words.slice(1),{yPercent:105});
-  const tl=gsap.timeline({scrollTrigger:{trigger:pin,start:"top top",end:"+=320%",pin:true,scrub:.7,anticipatePin:1,onUpdate:s=>{const i=Math.min(2,Math.round(s.progress*2));$("#pn").textContent="0"+(i+1);$("#psub").textContent=subs[i]}}});
-  [1,2].forEach(i=>{ const t=(i-1)*1.2;
-    tl.to(words[i-1],{yPercent:-105,duration:.6,ease:"power2.in"},t+.6)
-      .to(imgs[i],{clipPath:"inset(0% 0% 0% 0%)",duration:1,ease:"power2.inOut"},t+.4)
-      .fromTo(imgs[i].querySelector("img"),{scale:1.25},{scale:1,duration:1.2,ease:"none"},t+.4)
-      .to(words[i],{yPercent:0,duration:.6,ease:"power2.out"},t+.9); });
-  tl.to({},{duration:.5});
-}
-function hgallery(){
-  const hs=$("#hs"); if(!hs) return;
-  if(innerWidth>1000){ const tr=$("#hst"), dist=()=>tr.scrollWidth-innerWidth+60;
-    gsap.to(tr,{x:()=>-dist(),ease:"none",scrollTrigger:{trigger:hs,start:"top top",end:()=>"+="+dist(),pin:".hs-pin",scrub:.6,invalidateOnRefresh:true,anticipatePin:1}});
-    $$(".hs-i .pic img",hs).forEach(im=>gsap.fromTo(im,{xPercent:-8},{xPercent:8,ease:"none",scrollTrigger:{trigger:hs,start:"top top",end:()=>"+="+dist(),scrub:true}}));
-  } else { $("#hst").style.cssText="overflow-x:auto;width:auto;padding-bottom:20px"; $(".hs-pin").style.height="auto"; hs.style.padding="60px 0" }
-}
-function followHover(sel,build){
-  const f=document.createElement("div"); f.className="follow"; document.body.appendChild(f);
-  const qx=gsap.quickTo(f,"left",{duration:.5,ease:"power3"}),qy=gsap.quickTo(f,"top",{duration:.5,ease:"power3"});
-  $$(sel).forEach(a=>{
-    a.addEventListener("mouseenter",()=>{f.innerHTML=build(a);gsap.to(f,{opacity:1,scale:1,duration:.5,ease:"power3.out"})});
-    a.addEventListener("mouseleave",()=>gsap.to(f,{opacity:0,scale:.8,duration:.4}));
-    a.addEventListener("mousemove",e=>{qx(e.clientX+40);qy(e.clientY)});
-  });
-}
-function homeMock(delay){
-  const urls=["red-arch","green-sequin","cream-lamp","purple-flow"].map(n=>"images/real/"+n+".jpg");
-  const fb=$(".h-fb"); let gl=null;
-  if(window.MP_GL&&MP_GL.ok()){ gl=MP_GL.hero($("#heroGL"),urls); if(gl) fb.style.visibility="hidden"; }
-  if(!gl){ const arch=$("#harch"); const imgs=[fb]; urls.slice(1).forEach(u=>{const im=fb.cloneNode();im.src=u;im.style.opacity=0;arch.appendChild(im);imgs.push(im)}); let c=0;
-    gl={next(){const n=(c+1)%imgs.length;gsap.to(imgs[c],{opacity:0,duration:1.2});gsap.to(imgs[n],{opacity:1,duration:1.2});c=n}}; }
-  if(!matchMedia("(prefers-reduced-motion:reduce)").matches) setTimeout(()=>setInterval(()=>{ if(!document.hidden) gl.next() },5200),delay*1000+1500);
-  $("#harch").addEventListener("click",()=>gl.next());
-  const tl=gsap.timeline({delay});
-  tl.fromTo(".mk-h1 .ln i",{yPercent:115},{yPercent:0,duration:1.4,ease:"expo.out",stagger:.12},0)
-    .fromTo(".mk-eye,.mk-p,.mk-btns,.mk-trust",{opacity:0,y:24},{opacity:1,y:0,duration:1,stagger:.1,ease:"power3.out"},.3)
-    .fromTo(".mk-trio figure",{y:90,opacity:0},{y:0,opacity:1,duration:1.4,stagger:.14,ease:"expo.out"},.2)
-    .fromTo(".mk-trio .pic",{clipPath:"inset(100% 0 0 0)"},{clipPath:"inset(0% 0 0 0)",duration:1.5,stagger:.14,ease:"expo.inOut"},.1);
-  gsap.to(".mk-water",{xPercent:-6,ease:"none",scrollTrigger:{trigger:".mk-water",start:"top bottom",end:"bottom top",scrub:true}});
-  document.querySelectorAll(".mk-box,.mk-master,.mk-featured .mk-head,.mk-banner,.mk-jstrip figure").forEach(e=>e.classList.add("rv"));
-  reveal();
-  document.querySelectorAll(".mk-collage .pic").forEach((p,i)=>gsap.fromTo(p,{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)",duration:1.3,ease:"expo.out",delay:i*.12,scrollTrigger:{trigger:".mk-collage",start:"top 80%",once:true}}));
-  gsap.from(".mk-cats a",{y:30,opacity:0,duration:.9,stagger:.08,ease:"power3.out",scrollTrigger:{trigger:".mk-cats",start:"top 90%",once:true}});
-  gsap.from(".mk-promise .peacock",{y:60,opacity:0,rotate:4,duration:1.6,ease:"expo.out",scrollTrigger:{trigger:".mk-promise",start:"top 85%",once:true}});
-  gsap.to(".mk-promise .peacock",{y:-14,duration:3.2,ease:"sine.inOut",yoyo:true,repeat:-1});
-  gsap.to(".mk-peacock-wm",{yPercent:-12,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-}
-function homeTR(delay){
-  const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
-  // hero intro
-  const tl=gsap.timeline({delay});
-  tl.fromTo(".tr-tag",{opacity:0,x:-30},{opacity:1,x:0,duration:.9,ease:"power3.out"},0)
-    .fromTo(".tr-h1 .ln i",{yPercent:118},{yPercent:0,duration:1.5,ease:"expo.out",stagger:.14},.1)
-    .fromTo(".tr-star",{scale:0,rotate:-90,opacity:0},{scale:1,rotate:0,opacity:1,duration:1.2,ease:"back.out(2)",stagger:.2},.9)
-    .fromTo(".tr-sub,.tr-stats",{opacity:0,y:28},{opacity:1,y:0,duration:1,stagger:.12,ease:"power3.out"},.7)
-    .fromTo(".tr-gold",{scaleY:0,transformOrigin:"bottom"},{scaleY:1,duration:1.2,ease:"expo.out"},.5)
-    .fromTo(".tr-swatch",{scale:.6,opacity:0,rotate:-8},{scale:1,opacity:1,rotate:0,duration:1.1,ease:"back.out(1.6)"},1)
-    .fromTo(".tr-model",{yPercent:12,opacity:0},{yPercent:0,opacity:1,duration:1.5,ease:"expo.out"},.6);
-  // peacock feathers: grow in, then sway, drift on scroll
-  tl.fromTo(".tr-feather",{scale:.3,opacity:0,transformOrigin:"19% 99%"},{scale:1,opacity:1,duration:1.6,ease:"elastic.out(1,.6)",stagger:.15},1.1);
-  qa(".tr-feather").forEach((fe,i)=>{gsap.to(fe,{rotation:"+="+(i%2?7:-7),duration:3+i*.6,ease:"sine.inOut",yoyo:true,repeat:-1,transformOrigin:"19% 99%"});
-    gsap.to(fe,{yPercent:-12-(i*5),ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}})});
-  // sparkles keep pulsing
-  qa(".tr-star").forEach((s,i)=>gsap.to(s,{scale:1.25,rotate:i?-45:45,duration:2.2+i,ease:"sine.inOut",yoyo:true,repeat:-1}));
-  // scroll drift
-  gsap.to(".tr-h1 .ln:nth-child(1)",{xPercent:-5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to(".tr-h1 .ln:nth-child(2)",{xPercent:5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to(".tr-model",{yPercent:-5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  gsap.to(".tr-swatch",{yPercent:-18,rotate:4,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
-  // marquee speed follows scroll
-  qa(".tr-band div").forEach((b,i)=>gsap.to(b,{xPercent:i?20:-20,ease:"none",scrollTrigger:{trigger:b.parentNode,start:"top bottom",end:"bottom top",scrub:true}}));
-  // about photo reveal
-  gsap.fromTo(".tr-ph .pic",{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)",duration:1.4,ease:"expo.out",scrollTrigger:{trigger:".tr-ph",start:"top 82%",once:true}});
-  // product tiles: hover lift on the cut-out + filter chips
-  qa(".tr-tile:not(.viewall)").forEach(t=>{const c=t.querySelector("img");t.addEventListener("mouseenter",()=>gsap.to(c,{y:-10,scale:1.04,duration:.5,ease:"power3.out"}));t.addEventListener("mouseleave",()=>gsap.to(c,{y:0,scale:1,duration:.6,ease:"power3.out"}))});
-  const chips=qa(".tr-chips .chip");
-  chips.forEach(ch=>ch.addEventListener("click",()=>{chips.forEach(x=>x.classList.toggle("on",x===ch));const f=ch.dataset.c;
-    qa("#trgrid .tr-tile:not(.viewall)").forEach(t=>{const show=f==="all"||t.dataset.f.split(" ").includes(f);gsap.to(t,{opacity:show?1:0,scale:show?1:.92,duration:.4,onStart:()=>{if(show)t.style.display=""},onComplete:()=>{if(!show)t.style.display="none"}})});}));
-  document.querySelectorAll(".tr-brands>div,.tr-ban,.tr-jew figure,.tr-tile").forEach(e=>e.classList.add("rv"));
-  reveal();
-  gsap.from(".tr-ban .tr-h2",{yPercent:40,opacity:0,duration:1.3,ease:"expo.out",scrollTrigger:{trigger:".tr-ban",start:"top 70%",once:true}});
-}
-function MP_start(pg){
-  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches||location.search.includes("nomotion");
-  const pre=document.createElement("div");
-  const wantPre=!reduce&&!location.search.includes("nopre")&&!sessionStorage.getItem("mp_pre");
-  if(!hasG()||reduce){
-    $$(".rv").forEach(e=>e.style.cssText="opacity:1;transform:none");
-    if(pg==="home"&&window.MP_GL){ try{ homeHeroStatic() }catch(e){} }
-    return;
-  }
-  gsap.registerPlugin(ScrollTrigger);
-  // smooth scrolling
-  if(window.Lenis&&innerWidth>1000){ const l=new Lenis({lerp:.09}); l.on("scroll",ScrollTrigger.update); gsap.ticker.add(t=>l.raf(t*1000)); gsap.ticker.lagSmoothing(0); }
-  let delay=.15;
-  if(wantPre){
-    try{sessionStorage.setItem("mp_pre","1")}catch(e){}
-    pre.id="pre"; pre.innerHTML='<div class="pl-strips">'+"<i class=\"pl-s\"></i>".repeat(6)+'</div><div class="pl-in"><div class="pl-logo"><img src="images/logo.png" alt="Moorpankh"></div><div class="pl-bar"><i></i></div><div class="pl-n"><b id="pln">0</b>%</div></div>'; document.body.appendChild(pre);
-    document.documentElement.style.overflow="hidden";
-    const cnt={n:0};
-    const t=gsap.timeline({onComplete:()=>{pre.remove();document.documentElement.style.overflow=""}});
-    t.fromTo("#pre .pl-logo",{clipPath:"inset(0 100% 0 0)"},{clipPath:"inset(0 0% 0 0)",duration:1.4,ease:"power3.inOut"},0.1)
-     .fromTo("#pre .pl-bar i",{scaleX:0},{scaleX:1,duration:1.6,ease:"power2.inOut"},0.1)
-     .to(cnt,{n:100,duration:1.6,ease:"power2.inOut",onUpdate:()=>{const e=document.getElementById("pln");if(e)e.textContent=Math.round(cnt.n)}},0.1)
-     .to("#pre .pl-in",{opacity:0,y:-24,duration:.5,ease:"power2.in"},"+=.2")
-     .to("#pre .pl-s",{yPercent:-101,duration:1.1,ease:"expo.inOut",stagger:.09},"<.15");
-    delay=2.7; setTimeout(()=>{pre.remove();document.documentElement.style.overflow=""},7000);
-  }
-  reveal();
-  $$(".split-line").forEach(el=>{splitWords(el);gsap.from($$(".w i",el),{yPercent:115,duration:1.2,ease:"expo.out",stagger:.07,scrollTrigger:{trigger:el,start:"top 88%",once:true}})});
-  $$("img[data-par]").forEach(im=>{ const box=im.closest(".pic")||im.parentElement; if(box.closest(".hs-i")) return;
-    gsap.fromTo(im,{yPercent:-9,scale:1.18},{yPercent:9,scale:1.18,ease:"none",scrollTrigger:{trigger:box,start:"top bottom",end:"bottom top",scrub:true}}) });
-  if(pg==="home") homeTR(delay);
-  window.addEventListener("load",()=>ScrollTrigger.refresh());
-  pointer();
-}
-function homeHeroStatic(){ const c=$("#heroGL"); if(c&&MP_GL.ok()){ const g=MP_GL.hero(c,["images/hero-1.jpg","images/hero-3.jpg"]); if(g) $(".h-fb").style.visibility="hidden"; } }
-function pointer(){
-  if(!matchMedia("(hover:hover) and (pointer:fine)").matches||!window.gsap)return;
-  document.documentElement.classList.add("feather-cur");
-  const c=document.createElement("div");c.id="cur";c.innerHTML='<img src="images/feather.png?v=1" alt="" aria-hidden="true">';document.body.appendChild(c);
-  gsap.set(c,{transformOrigin:"19% 99%",rotation:-6,xPercent:0,yPercent:0,opacity:0});
-  const x=gsap.quickTo(c,"x",{duration:.16,ease:"power3"}),y=gsap.quickTo(c,"y",{duration:.16,ease:"power3"}),r=gsap.quickTo(c,"rotation",{duration:.55,ease:"power3"});
-  let lx=0,shown=false;
-  addEventListener("mousemove",e=>{if(!shown){shown=true;gsap.to(c,{opacity:1,duration:.3})}x(e.clientX);y(e.clientY);r(-6+gsap.utils.clamp(-28,28,(e.clientX-lx)*1.4));lx=e.clientX});
-  document.addEventListener("mouseleave",()=>gsap.to(c,{opacity:0,duration:.2}));document.addEventListener("mouseenter",()=>{if(shown)gsap.to(c,{opacity:1,duration:.2})});
-  document.addEventListener("mouseover",e=>{const t=e.target.closest("a,button,.card-p,.tr-tile,.zoom,summary,.chip");gsap.to(c,{scale:t?1.45:1,duration:.35,ease:"power3.out"})});
-  document.addEventListener("mousedown",()=>gsap.to(c,{scale:.85,duration:.12}));document.addEventListener("mouseup",()=>gsap.to(c,{scale:1.2,duration:.25,ease:"back.out(3)"}));
-  $$(".mag").forEach(b=>{const mx=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),my=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
-    b.addEventListener("mousemove",e=>{const r=b.getBoundingClientRect();mx((e.clientX-r.left-r.width/2)*.25);my((e.clientY-r.top-r.height/2)*.35)});
-    b.addEventListener("mouseleave",()=>{mx(0);my(0)})});
-}
+
+pages.collections=()=>{
+ const q=new URLSearchParams(location.search);let cat=q.get("cat")||({sarees:"sarees",jewellery:"jewellery"}[pg])||"all";if(!CATS.some(c=>c[0]===cat))cat="all";
+ const st={cat,types:new Set(),avail:"",price:"",sort:"feat",dense:false};
+ const types=[...new Set(P.map(p=>p.sub))];
+ const prices=[["lt5","Under 5,000",p=>p.price>0&&p.price<5000],["mid","5,000 – 8,000",p=>p.price>=5000&&p.price<=8000],["gt8","Over 8,000",p=>p.price>8000]];
+ const list=()=>{let l=P.filter(p=>inCat(p,st.cat));if(st.types.size)l=l.filter(p=>st.types.has(p.sub));
+  if(st.avail==="in")l=l.filter(buyable);if(st.avail==="req")l=l.filter(p=>!p.price);
+  const pr=prices.find(x=>x[0]===st.price);if(pr)l=l.filter(pr[2]);
+  if(st.sort==="feat")l=[...l].sort((a,b)=>(hasPic(b)-hasPic(a))||(!!b.price-!!a.price));
+  if(st.sort==="lo")l=[...l].sort((a,b)=>(a.price||1e9)-(b.price||1e9));if(st.sort==="hi")l=[...l].sort((a,b)=>b.price-a.price);if(st.sort==="az")l=[...l].sort((a,b)=>a.name.localeCompare(b.name));return l};
+ const title=()=>({all:"All Products",best:"Best Sellers",new:"New Arrivals",sarees:"Vintage Sarees",jewellery:"Handmade Jewellery"}[st.cat]);
+ const draw=()=>{const l=list();$("#cgrid").innerHTML=l.length?l.map(p=>card(p)).join(""):`<p class="empty" style="grid-column:1/-1">No pieces match these filters.</p>`;$("#cgrid").classList.toggle("d2",st.dense);$("#ctitle").textContent=title();$$(".pills .pill").forEach(b=>b.classList.toggle("on",b.dataset.c===st.cat));$("#fcount").textContent=l.length+" of "+P.length+" products";document.title=title()+" — Moorpankh"};
+ const fdraw=()=>{$("#fbody").innerHTML=`<div class="fgrp"><h4>Type</h4><div class="chips">${types.map(t=>`<button class="chip ${st.types.has(t)?"on":""}" data-t="${esc(t)}">${esc(t)}<small>(${P.filter(p=>p.sub===t).length})</small></button>`).join("")}</div></div>
+  <div class="fgrp"><h4>Availability</h4><div class="chips">${[["in","Ready to order"],["req","Price on request"]].map(a=>`<button class="chip ${st.avail===a[0]?"on":""}" data-a="${a[0]}">${a[1]}</button>`).join("")}</div></div>
+  <div class="fgrp"><h4>Price</h4><div class="chips">${prices.map(a=>`<button class="chip ${st.price===a[0]?"on":""}" data-p="${a[0]}">${a[1]}</button>`).join("")}</div></div>
+  <div class="fsort"><label for="fsort">Sort by:</label><select id="fsort">${[["feat","Featured"],["lo","Price: low to high"],["hi","Price: high to low"],["az","Name A–Z"]].map(s=>`<option value="${s[0]}" ${st.sort===s[0]?"selected":""}>${s[1]}</option>`).join("")}</select></div>`;
+  draw()};
+ setTimeout(()=>{
+  $$(".pills .pill").forEach(b=>b.onclick=()=>{st.cat=b.dataset.c;history.replaceState(null,"","collections.html"+(st.cat==="all"?"":"?cat="+st.cat));draw();fdraw()});
+  $("#fOpen").onclick=()=>{closeAll();fdraw();$("#dFilter").classList.add("on");$("#scrim").classList.add("on")};
+  $("#fbody").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;if(c.dataset.t!==undefined){const t=c.dataset.t;st.types.has(t)?st.types.delete(t):st.types.add(t)}if(c.dataset.a)st.avail=st.avail===c.dataset.a?"":c.dataset.a;if(c.dataset.p)st.price=st.price===c.dataset.p?"":c.dataset.p;fdraw()};
+  $("#fbody").onchange=e=>{if(e.target.id==="fsort"){st.sort=e.target.value;fdraw()}};
+  $("#fReset").onclick=()=>{st.types.clear();st.avail="";st.price="";st.sort="feat";fdraw()};$("#fApply").onclick=closeAll;
+  $("#gBtn").onclick=()=>{st.dense=!st.dense;draw()};draw()});
+ return `<div class="ph-top"><h1 id="ctitle"></h1><div class="ph-tools"><button class="gbtn" id="gBtn" aria-label="Change layout">${I.grid}</button><button class="fbtn" id="fOpen">${I.filt}Advance Filters</button></div></div>
+ <div class="pills" role="tablist">${CATS.map(c=>`<button class="pill" data-c="${c[0]}">${c[1]}</button>`).join("")}</div>
+ <section class="coll"><div class="grid" id="cgrid"></div></section>
+ <aside class="drw" id="dFilter" aria-label="Filter"><div class="drw-h"><h3>Filter</h3><small id="fcount"></small><button class="drw-x" data-close aria-label="Close" style="margin-left:14px">${I.x}</button></div><div class="drw-b" id="fbody"></div><div class="drw-f two"><button class="btn pill out" id="fReset">Remove all</button><button class="btn pill" id="fApply">Apply</button></div></aside>`};
+pages.sarees=pages.collections;pages.jewellery=pages.collections;pages.shop=pages.collections;
+
+pages.product=()=>{
+ const id=new URLSearchParams(location.search).get("id"),p=byId(id);
+ if(!p)return `<div class="pg-wrap"><p class="pg-title">Piece not found</p><a class="link" href="collections.html">Back to collections</a></div>`;
+ document.title=p.name+" — Moorpankh";const m=media(p);
+ const imgs=[];if(m.cut)imgs.push({s:m.cut,c:""});else if(m.photos[0])imgs.push({s:m.photos[0],c:"cv"});
+ (m.cut?m.photos:m.photos.slice(1)).forEach(s=>imgs.push({s,c:"cv"}));
+ const gal=imgs.length?imgs.map((x,i)=>`<div class="pg" data-z="${x.s}">${i===0?`<button class="pg-bm ${wish.includes(p.id)?"on":""}" data-wish="${p.id}" aria-label="Save">${I.bm}</button>`:""}<img class="${x.c}" src="${x.s}" alt="${esc(p.name)}" ${i?'loading="lazy"':""}></div>`).join(""):`<div class="pg empty"><img src="images/peacock.png" alt=""></div>`;
+ const rel=P.filter(x=>x.cat===p.cat&&x.id!==p.id).sort((a,b)=>hasPic(b)-hasPic(a)).slice(0,4);
+ const msg=`Hello Moorpankh! I'd like to order / ask about: ${p.name}${p.price?" ("+money(p.price)+")":""}. ${location.href}`;
+ setTimeout(()=>{
+  let q=1;const set=()=>$("#q").textContent=q;
+  if($("#qm")){$("#qm").onclick=()=>{q=Math.max(1,q-1);set()};$("#qp").onclick=()=>{q=Math.min(p.stock||99,q+1);set()};$("#add").onclick=()=>addToCart(p.id,q);$("#buy").onclick=()=>{if(addToCart(p.id,q,false))location.href="checkout.html"}}
+  $("#dchk").onclick=()=>{const v=$("#dcity").value.trim();$("#dres").textContent=v?`Delivery to ${v}: ${C.deliveryEstimate}. Cash on Delivery available. Exact timing is confirmed on WhatsApp.`:"Please enter your city."};
+  $("#dcity").onkeydown=e=>{if(e.key==="Enter")$("#dchk").click()};
+  $$(".tabs-h button").forEach(b=>b.onclick=()=>{$$(".tabs-h button").forEach(x=>x.classList.toggle("on",x===b));$$(".tabs-b>div").forEach(d=>d.hidden=d.dataset.t!==b.dataset.t)});
+  $$(".pg[data-z]").forEach(g=>g.onclick=e=>{if(e.target.closest("[data-wish]"))return;const l=$("#lbx");l.querySelector("img").src=g.dataset.z;l.classList.add("on")});
+  $("#lbx").onclick=()=>$("#lbx").classList.remove("on")});
+ return `<div class="pdp"><div class="pdp-gal">${gal}</div>
+ <aside class="pi"><div class="pi-top"><div><h1>${esc(p.name)}</h1><div class="pi-p">${priceTxt(p)}</div></div><span class="pi-t">${esc(p.sub)}</span></div>
+  <div class="pi-st">${p.stock===0?"Sold out":p.price?"Available":"Price on request"}</div>
+  ${buyable(p)?`<div class="pi-q"><span>Quantity</span><div class="qty"><button id="qm" aria-label="Less">−</button><span id="q">1</span><button id="qp" aria-label="More">+</button></div></div><div class="pi-act"><button class="btn pill out" id="add">Add to bag</button><button class="btn pill" id="buy">Buy now</button></div>`:`<div class="pi-act" style="grid-template-columns:1fr"><a class="btn pill wa" href="${waLink(msg)}" target="_blank" rel="noopener">${p.stock===0?"Ask about restock":"Enquire on WhatsApp"}</a></div>`}
+  <hr><div class="pi-dl">${I.truck}Check delivery details</div><div class="pi-chk"><input id="dcity" placeholder="Enter city" aria-label="City"><button class="btn" id="dchk">Check</button></div><div class="pi-res" id="dres"></div>
+  <div class="tabs"><div class="tabs-h"><button class="on" data-t="d">Details &amp; description</button><button data-t="s">Shipping</button></div><div class="tabs-b"><div data-t="d"><h6>Details</h6><p>${esc(p.sub)} · ${p.cat==="jewellery"?"Handmade jewellery":p.cat==="sarees"?"Vintage saree":"Ready to wear"}</p><h6>Description</h6><p>${esc(p.desc)}</p><p style="margin-top:10px"><a class="link" href="${waLink(msg)}" target="_blank" rel="noopener">Order or ask on WhatsApp</a></p></div><div data-t="s" hidden><h6>Delivery</h6><p>Across Pakistan, estimated ${C.deliveryEstimate}. Cash on Delivery available.</p><h6>Exchanges &amp; returns</h6><p>See our <a class="link" href="shipping.html">shipping &amp; returns</a> page.</p></div></div></div></aside></div>
+ ${rel.length?`<section class="sec"><div class="sec-h"><h2>You may also like</h2></div><div class="grid">${rel.map(x=>card(x)).join("")}</div></section>`:""}
+ <div class="lbx" id="lbx"><img alt=""></div>`};
+
+pages.wishlist=()=>{const l=wish.map(byId).filter(Boolean);return `<div class="ph-top"><h1>Saved Pieces</h1></div><section class="coll" style="padding-top:26px">${l.length?`<div class="grid">${l.map(p=>card(p)).join("")}</div>`:`<p class="empty">Nothing saved yet. <a class="link" href="collections.html" style="margin-left:8px">Browse collections</a></p>`}</section>`};
+
+const sumHTML=()=>{const t=totals();return `<div class="sumrow"><span>Subtotal</span><span>${money(t.sub)}</span></div><div class="sumrow"><span>Delivery</span><span>${t.ship?money(t.ship):"Confirmed on WhatsApp"}</span></div><div class="sumrow t"><span>Total</span><span>${money(t.total)}</span></div>`};
+pages.cart=()=>{setTimeout(()=>{const draw=()=>{const L=lines();$("#cl").innerHTML=L.length?L.map(({p,qty})=>`<div class="ci"><a class="ci-i ${media(p).cut||media(p).photos[0]?"":"ph"}" href="product.html?id=${p.id}">${thumbHTML(p)}</a><div><a class="ci-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="ci-p">${money(p.price)}</div><div class="qty"><button data-q="-" data-id="${p.id}">−</button><span>${qty}</span><button data-q="+" data-id="${p.id}">+</button></div></div><div class="ci-r">${money(p.price*qty)}<button data-rm="${p.id}">Remove</button></div></div>`).join(""):`<div class="cart-empty">${I.bag}Your bag is empty.</div>`;$("#cs").innerHTML=sumHTML();$("#co").style.display=L.length?"":"none"};window.__cartDraw=draw;draw()});
+ return `<div class="pg-wrap"><p class="pg-title">Your Bag</p><div class="two"><div id="cl"></div><aside class="card"><div id="cs"></div><a id="co" class="btn pill" style="width:100%;margin-top:18px" href="checkout.html">Checkout</a></aside></div></div>`};
+
+pages.checkout=()=>{const u=me();
+ setTimeout(()=>{const f=$("#cf");if(!f)return;$("#cks").innerHTML=lines().map(({p,qty})=>`<div class="sumrow"><span>${esc(p.name)} × ${qty}</span><span>${money(p.price*qty)}</span></div>`).join("")+sumHTML();
+  f.onsubmit=e=>{e.preventDefault();const L=lines();if(!L.length)return toast("Your bag is empty");const d=Object.fromEntries(new FormData(f));const t=totals();
+   const order={no:"MP"+Date.now().toString().slice(-7),date:new Date().toISOString(),email:(me()||{}).email||d.email||"",customer:d,items:L.map(x=>({id:x.p.id,name:x.p.name,price:x.p.price,qty:x.qty})),...t,status:"Pending confirmation"};
+   const all=store.get("orders",[]);all.push(order);store.set("orders",all);
+   const msg=`New Moorpankh order ${order.no}\n\n`+order.items.map(i=>`• ${i.name} × ${i.qty} — ${money(i.price*i.qty)}`).join("\n")+`\n\nTotal: ${money(t.total)}\nPayment: ${d.pay}\n\nName: ${d.name}\nPhone: ${d.phone}\nAddress: ${d.address}, ${d.city}${d.postal?" "+d.postal:""}\n${d.notes?"Notes: "+d.notes:""}`;
+   cart=[];saveCart();$("#app").innerHTML=`<div class="pg-wrap" style="text-align:center;padding-top:90px"><p class="pg-title">Order received</p><h1 style="font:italic 600 clamp(2rem,5vw,3.6rem)/1.1 var(--serif);margin-bottom:18px">Thank you, ${esc(d.name.split(" ")[0])}.</h1><p style="max-width:52ch;margin:0 auto 26px;color:#5f5a52">Your order <b>${order.no}</b> is saved. <b>Tap the button below to send it to us on WhatsApp</b>; we confirm every order there${d.pay==="Cash on Delivery"?" and you pay on delivery":", along with payment details"}. Estimated delivery: ${C.deliveryEstimate}.</p><a class="btn pill wa" href="${waLink(msg)}" target="_blank" rel="noopener">Send order on WhatsApp</a><p style="margin-top:26px"><a class="link" href="collections.html">Continue shopping</a></p></div>`;scrollTo(0,0)}});
+ return `<div class="pg-wrap"><p class="pg-title">Checkout</p>${lines().length?`<div class="two"><form id="cf" class="form card"><p class="up" style="color:var(--mute)">Delivery details</p>
+  <div class="g2"><label class="f">Full name<input name="name" required autocomplete="name" value="${esc(u?u.name:"")}"></label><label class="f">Phone / WhatsApp<input name="phone" type="tel" required pattern="[0-9+ \\-]{10,15}" autocomplete="tel" placeholder="03XX XXXXXXX" value="${esc(u?u.phone||"":"")}"></label></div>
+  <label class="f">Email (optional)<input name="email" type="email" autocomplete="email" value="${esc(u?u.email:"")}"></label>
+  <label class="f">Street address<textarea name="address" rows="2" required autocomplete="street-address"></textarea></label>
+  <div class="g2"><label class="f">City<input name="city" required autocomplete="address-level2"></label><label class="f">Postal code<input name="postal" autocomplete="postal-code"></label></div>
+  <label class="f">Order notes<textarea name="notes" rows="2"></textarea></label>
+  <p class="up" style="color:var(--mute);margin-top:6px">Payment</p>
+  <label class="opt"><input type="radio" name="pay" value="Cash on Delivery" checked><span><b>Cash on Delivery</b><br>Available across Pakistan.</span></label>
+  <label class="opt"><input type="radio" name="pay" value="Online transfer (JazzCash/Easypaisa/Bank)"><span><b>Online transfer</b><br>${esc(C.paymentNote)}</span></label>
+  <button class="btn pill" style="height:48px">Place order</button><small style="color:var(--mute)">Your details stay on your device and are sent only to Moorpankh via WhatsApp.</small></form>
+  <aside class="card"><p class="up" style="color:var(--mute);margin-bottom:10px">Your order</p><div id="cks"></div></aside></div>`:`<p class="empty">Your bag is empty. <a class="link" href="collections.html" style="margin-left:8px">Continue shopping</a></p>`}</div>`};
+
+pages.account=()=>{
+ const render=()=>{const u=me();const box=$("#acc");
+  if(u){const mine=store.get("orders",[]).filter(o=>o.email===u.email);
+   box.innerHTML=`<div class="two"><div class="card"><p class="up" style="color:var(--mute);margin-bottom:12px">Hello, ${esc(u.name.split(" ")[0])}</p><div class="sumrow"><span>Name</span><span>${esc(u.name)}</span></div><div class="sumrow"><span>Email</span><span>${esc(u.email)}</span></div><div class="sumrow"><span>Phone</span><span>${esc(u.phone||"—")}</span></div><p style="margin-top:20px"><button class="btn pill out" id="so">Sign out</button></p></div>
+   <div class="card" id="orders"><p class="up" style="color:var(--mute);margin-bottom:6px">Order history</p>${mine.length?mine.slice().reverse().map(o=>`<div class="ordr"><div><b>${o.no}</b><br><small style="color:var(--mute)">${new Date(o.date).toLocaleDateString("en-GB")} · ${o.items.length} item${o.items.length>1?"s":""}</small></div><div style="text-align:right">${money(o.total)}<br><small style="color:var(--mute)">${esc(o.status)}</small></div></div>`).join(""):`<p style="color:var(--mute);padding:14px 0">No orders yet.</p>`}</div></div>`;
+   $("#so").onclick=()=>{store.set("session",null);render();toast("Signed out")}}
+  else{box.innerHTML=`<div class="two"><form class="card form" id="lf"><p class="up" style="color:var(--mute)">Sign in</p><label class="f">Email<input name="email" type="email" required autocomplete="email"></label><label class="f">Password<input name="pw" type="password" required autocomplete="current-password"></label><button class="btn pill">Sign in</button><small id="lerr" style="color:#a33"></small></form>
+   <form class="card form" id="rf"><p class="up" style="color:var(--mute)">Create account</p><label class="f">Full name<input name="name" required autocomplete="name"></label><label class="f">Email<input name="email" type="email" required autocomplete="email"></label><label class="f">Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="f">Password (6+ characters)<input name="pw" type="password" minlength="6" required autocomplete="new-password"></label><button class="btn pill out">Create account</button><small style="color:var(--mute)">Accounts are saved on this device only. There is no online account system yet.</small></form></div>`;
+   $("#lf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const u=users().find(x=>x.email===d.email.toLowerCase());if(u&&u.hash===await hash(u.salt+d.pw)){store.set("session",u.email);render();toast("Signed in")}else $("#lerr").textContent="Email or password is incorrect."};
+   $("#rf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const em=d.email.toLowerCase();if(users().some(x=>x.email===em)){toast("That email already has an account");return}const salt=crypto.getRandomValues(new Uint32Array(2)).join("-");const all=users();all.push({name:d.name,email:em,phone:d.phone,salt,hash:await hash(salt+d.pw)});store.set("users",all);store.set("session",em);render();toast("Account created")}}};
+ setTimeout(()=>{render();if(location.hash==="#orders")setTimeout(()=>{const o=$("#orders");o&&o.scrollIntoView()},50)});
+ return `<div class="pg-wrap"><p class="pg-title">My Account</p><div id="acc"></div></div>`};
+
+pages.about=()=>`<section class="ab-hero"><img src="images/model-arch.jpg" alt="Two women in vintage sarees beneath a heritage archway"><div><h1>Moorpankh</h1><small>Scroll to explore</small></div></section>
+ <section class="ab-body"><div><h2>Timeless, on purpose.</h2><p>Moorpankh is a ${esc(C.city.split(",")[0])} label for vintage sarees, traditional fashion and handmade vintage jewellery.</p><p>Moorpankh means peacock feather, a symbol of grace and heritage. Every piece is chosen for its craft, its character and its timelessness, and made to be worn for years.</p><p><a class="btn" href="collections.html">Explore Collections</a></p></div><div class="ab-img"><img src="images/hero-1.jpg" alt="Model in a vintage saree" loading="lazy"></div></section>
+ <section class="ab-pts"><div><b>Vintage Sarees</b><span>Banarsi, hand block printed, cotton and statement sarees.</span></div><div><b>Handmade Jewellery</b><span>Handcrafted vintage-inspired earrings, necklaces, bangles and accessories.</span></div><div><b>Across Pakistan</b><span>Cash on Delivery, estimated ${C.deliveryEstimate}. Order on WhatsApp anytime.</span></div></section>`;
+
+pages.contact=()=>{setTimeout(()=>{const f=$("#ctf");if(f)f.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));window.open(waLink(`Hello Moorpankh, I'm ${d.name} (${d.phone}).\n${d.msg}`),"_blank","noopener");toast("Opening WhatsApp…")}});
+ return `<div class="pg-wrap"><p class="pg-title">Contact</p><div class="two"><form id="ctf" class="form card"><label class="f">Name<input name="name" required></label><label class="f">Phone<input name="phone" required></label><label class="f">Message<textarea name="msg" rows="5" required></textarea></label><button class="btn pill">Send via WhatsApp</button></form><div class="prose"><h2 style="margin-top:0">Reach us</h2><p>WhatsApp: <a class="link" href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener">Chat now</a></p><p>Instagram: <a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></p><p>Email: ${esc(C.email)}</p><p>${esc(C.city)}</p></div></div></div>`};
+pages.faq=()=>{const q=[["How long does delivery take?",`Estimated ${C.deliveryEstimate} across Pakistan.`],["Do you offer Cash on Delivery?","Yes, across Pakistan."],["Can I see more photos of a piece?","Message us on WhatsApp and we'll send more pictures."],["Some pieces say 'Price on request'. Why?","Those pieces have no listed price yet. Message us on WhatsApp for the price and availability."],["How do I pay online?",C.paymentNote]];
+ return `<div class="pg-wrap"><p class="pg-title">FAQs</p><div class="faq" style="max-width:760px">${q.map(x=>`<details><summary>${x[0]}</summary><p>${x[1]}</p></details>`).join("")}</div></div>`};
+pages.shipping=()=>`<div class="pg-wrap"><p class="pg-title">Shipping &amp; Returns</p><div class="prose"><h2>Delivery</h2><p>We ship across Pakistan from ${esc(C.city)}. Estimated delivery: ${C.deliveryEstimate}.</p><h2>Payment</h2><p>Cash on Delivery, or online transfer confirmed on WhatsApp.</p><h2>Exchanges &amp; returns</h2><p>Our exchange and return policy will be published here. Until then, message us on WhatsApp and we'll help.</p></div></div>`;
 
 /* ---------- boot ---------- */
 function boot(){
-  const pg=document.body.dataset.page;
-  const html=pg==="sarees"?pages.shop("sarees"):pg==="jewellery"?pages.shop("jewellery"):(pages[pg]||pages.home)();
-  document.body.insertAdjacentHTML("afterbegin",header());
-  const app=$("#app"); app.innerHTML=html; app.insertAdjacentHTML("afterend",footer());
-  updateBadges();
-  const hdr=$("#hdr"), onS=()=>hdr.classList.toggle("solid",scrollY>40||pg!=="home"); onS(); addEventListener("scroll",onS,{passive:true});
-  $("#bg").onclick=()=>$("#nav").classList.toggle("open");
-  const s=$("#search"),sq=$("#sq"),sr=$("#sr");
-  $("#sbtn").onclick=()=>{s.classList.add("open");sq.focus()}; $("#sx").onclick=()=>s.classList.remove("open");
-  addEventListener("keydown",e=>{if(e.key==="Escape")s.classList.remove("open")});
-  sq.oninput=()=>{const v=sq.value.trim().toLowerCase();sr.innerHTML=v?P.filter(p=>(p.name+p.sub+p.cat+p.desc).toLowerCase().includes(v)).map(card).join("")||"<p>No results.</p>":"";$$(".rv",sr).forEach(e=>e.style.cssText="opacity:1;transform:none")};
-  const nf=$("#nf"); if(nf) nf.onsubmit=e=>{e.preventDefault();const em=nf.querySelector("input").value;const l=store.get("news",[]);l.push(em);store.set("news",l);nf.reset();toast("Thank you — we'll be in touch")};
-  MP_start(pg);
+ document.body.insertAdjacentHTML("afterbegin",chrome());
+ const app=$("#app");app.innerHTML=(pages[pg]||pages.home)();app.insertAdjacentHTML("afterend",footer());
+ badges();
+ const hd=$("#hd"),top=$("#toTop"),onS=()=>{hd.classList.toggle("solid",scrollY>40);top.classList.toggle("on",scrollY>500)};onS();addEventListener("scroll",onS,{passive:true});
+ top.onclick=()=>scrollTo({top:0,behavior:"smooth"});
+ $("#scrim").onclick=closeAll;
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeAll();const l=$("#lbx");l&&l.classList.remove("on")}});
+ document.addEventListener("click",e=>{
+  const t=e.target;let b;
+  if(t.closest("[data-close]"))return closeAll();
+  if(b=t.closest("[data-add]")){e.preventDefault();const id=b.dataset.add,p=byId(id);if(buyable(p))addToCart(id,1);else location.href="product.html?id="+id;return}
+  if(b=t.closest("[data-wish]")){e.preventDefault();e.stopPropagation();toggleWish(b.dataset.wish);return}
+  if(b=t.closest("[data-q]")){const it=cart.find(i=>i.id===b.dataset.id),p=byId(b.dataset.id);if(it){it.qty=b.dataset.q==="+"?Math.min(p.stock||99,it.qty+1):Math.max(1,it.qty-1);saveCart();renderCart();window.__cartDraw&&window.__cartDraw()}return}
+  if(b=t.closest("[data-rm]")){cart=cart.filter(i=>i.id!==b.dataset.rm);saveCart();renderCart();window.__cartDraw&&window.__cartDraw();return}
+  if(t.closest("#cBtn"))return openDrawer("cart");
+  if(t.closest("#sBtn")||t.closest("#sBtn2")){openDrawer("search");renderSearch($("#sq").value);return}
+  if(t.closest("#menuBtn"))return openDrawer("menu");
+  const a=t.closest("a[href]");if(a&&!a.target&&a.origin===location.origin&&!e.metaKey&&!e.ctrlKey&&a.pathname!==location.pathname){e.preventDefault();document.body.classList.add("leaving");setTimeout(()=>location.href=a.href,190)}
+ });
+ $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
+ const nf=$("#nf");nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
+ if(pg==="home")initLookbook();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
+ addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});
 }
-window.MP={add:addToCart,wish:toggleWish};
 document.addEventListener("DOMContentLoaded",boot);
 })();
