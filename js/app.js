@@ -115,7 +115,7 @@ pages.home=()=>{
  const L=lookbookItems();
  const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
- const mh=`<section class="mh"><div class="mh-hero"><img src="images/hero-3.jpg" alt="Model in a vintage banarsi saree"><a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
+ const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}" ${i?'loading="lazy"':""}>`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
  return mh+lb};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
@@ -284,6 +284,7 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
+ if(pg==="home"){const sl=[...document.querySelectorAll("#mhHero .mh-s")];if(sl.length>1&&!matchMedia("(prefers-reduced-motion:reduce)").matches){let k=0;setInterval(()=>{if(document.hidden||innerWidth>900)return;sl[k].classList.remove("on");k=(k+1)%sl.length;sl[k].classList.add("on")},4200)}}
  featherCursor();
  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
  addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});
