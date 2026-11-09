@@ -82,14 +82,30 @@ window.MP_PRODUCTS = [
    Products not listed here show a quiet placeholder until you add photos.
    ============================================================ */
 window.MP_MEDIA = {
-  "noor-e-afshan":         { photos:3, cut:"images/cut/white-sofa.png" },
-  "mango-cotton":          { photos:2, cut:"images/cut/mustard-garden.png" },
-  "lavender-dream":        { photos:2, cut:"images/cut/purple-brick.png" },
-  "azure-elegance":        { photos:2, cut:"images/cut/blue-brick.png" },
-  "maroon-formal":         { photos:2, cut:"images/cut/red-arch.png" },
-  "green-chiffon-banarsi": { photos:2, cut:"images/cut/green-lamp.png" },
-  "ethnic-bangles":        { photos:2 },
-  "hair-accessory":        { photos:1 }
+  "frida-chiffon": { photos:6 },
+  "viva-la-vida": { photos:6 },
+  "lavender-dream": { photos:4, cut:"images/cut/lavender-dream.png" },
+  "azure-elegance": { photos:4, cut:"images/cut/blue-brick.png" },
+  "noor-e-afshan": { photos:6, cut:"images/cut/white-sofa.png" },
+  "white-plum-cotton": { photos:4 },
+  "lawn-checkered-saree": { photos:6 },
+  "mango-cotton": { photos:4 },
+  "rust-banarsi": { photos:6, cut:"images/cut/mustard-garden.png" },
+  "black-banarsi": { photos:6, cut:"images/cut/black-banarsi.png" },
+  "green-chiffon-banarsi": { photos:6, cut:"images/cut/green-lamp.png" },
+  "mauve-banarsi": { photos:6, cut:"images/cut/mauve-banarsi.png" },
+  "maroon-formal": { photos:6, cut:"images/cut/maroon-formal.png" },
+  "chocolate-2pc": { photos:4 },
+  "pink-kaftan": { photos:6 },
+  "mustard-daily": { photos:3 },
+  "sky-tie-dye": { photos:4 },
+  "black-cotton-shirt": { photos:3 },
+  "lawn-checkered-2pc": { photos:5 },
+  "lawn-farshi": { photos:6 },
+  "arabic-lawn": { photos:3 },
+  "raja-rani-necklace": { photos:2 },
+  "hair-accessory": { photos:3 },
+  "ethnic-bangles": { photos:6 }
 };
 
 /* ============================================================
@@ -98,6 +114,6 @@ window.MP_MEDIA = {
    use the pieces that currently have photos. Change them to match your sales.)
    ============================================================ */
 window.MP_COLLECTIONS = {
-  best: ["noor-e-afshan","lavender-dream","maroon-formal","azure-elegance"],
-  new:  ["green-chiffon-banarsi","mango-cotton","ethnic-bangles","hair-accessory"]
+  best: ["noor-e-afshan","rust-banarsi","azure-elegance","maroon-formal"],
+  new:  ["green-chiffon-banarsi","mauve-banarsi","black-banarsi","lavender-dream"]
 };

@@ -13,7 +13,7 @@ const CATS=[["all","View All"],["best","Best Sellers"],["new","New Arrivals"],["
 const inCat=(p,c)=>c==="all"||(c==="best"?COL.best.includes(p.id):c==="new"?COL.new.includes(p.id):p.cat===c);
 
 /* ---------- media ---------- */
-function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=10":null,photos}}
+function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=pp`);return{cut:m.cut?m.cut+"?v=11":null,photos}}
 const hasPic=p=>{const m=media(p);return !!(m.cut||m.photos.length)};
 const MARK='<img src="images/peacock.png" alt="" aria-hidden="true">';
 function thumbHTML(p){const m=media(p);return m.cut?`<img src="${m.cut}" alt="${esc(p.name)}">`:m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
@@ -292,8 +292,8 @@ function boot(){
 /* peacock-feather pointer (desktop with a mouse only). The stem tip is the click point. */
 function featherCursor(){
  if(!matchMedia("(hover:hover) and (pointer:fine)").matches||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
- const W=44,H=93,TX=.19*W,TY=.99*H;   // tip position inside the image
- const c=document.createElement("div");c.id="cur";c.setAttribute("aria-hidden","true");c.innerHTML='<img src="images/feather.png?v=1" alt="">';document.body.appendChild(c);
+ const W=32,H=68,TX=.19*W,TY=.99*H;   // tip position inside the image
+ const c=document.createElement("div");c.id="cur";c.setAttribute("aria-hidden","true");c.innerHTML='<img src="images/feather.png?v=2" alt="">';document.body.appendChild(c);
  document.documentElement.classList.add("feather-cur");
  let x=-200,y=-200,tx=x,ty=y,rot=-8,trot=-8,sc=1,tsc=1,vis=false,lx=0;
  addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY;trot=-8+Math.max(-26,Math.min(26,(e.clientX-lx)*1.3));lx=e.clientX;if(!vis){vis=true;x=tx;y=ty;c.style.opacity=1}},{passive:true});
