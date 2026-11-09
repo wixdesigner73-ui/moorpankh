@@ -34,7 +34,7 @@ function toast(m){let t=$(".toast");if(!t){t=document.createElement("div");t.cla
 const CUT={"noor-e-afshan":["white-sofa","#d3c0a2"],"mango-cotton":["mustard-garden","#8a5a37"],"lavender-dream":["purple-brick","#2c2724"],"azure-elegance":["blue-brick","#b9a083"],"maroon-formal":["red-arch","#a0643f"],"green-chiffon-banarsi":["green-lamp","#d2c4aa"]};
 const ph = (p,i=0,cls="")=>{
   if(i===0&&CUT[p.id]&&!cls.includes("raw")) return `<div class="ph cutph ${cls}" style="--tb:${CUT[p.id][1]}"><img class="cut" src="images/cut/${CUT[p.id][0]}.png?v=2" alt="${esc(p.name)}" loading="lazy"></div>`;
-  const src=`images/products/${p.id}${i?"-"+(i+1):""}.jpg`;
+  const src=`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`;
   const lum=(h=>{const n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255})(p.c1||"#888888");
   return `<div class="ph ${lum>.62?"lt ":""}${cls}" style="--c1:${p.c1};--c2:${p.c2}"><span>${esc(p.name)}</span><img src="${src}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()"></div>`;
 };
@@ -108,7 +108,7 @@ pages.home = () => {
   // product tiles: [id, tile colour, filter tags, cutout?]
   const tiles=[["noor-e-afshan","#d3c0a2","sarees semi",1],["mango-cotton","#8a5a37","sarees cotton",1],["lavender-dream","#2c2724","sarees blockprint",1],["azure-elegance","#b9a083","sarees blockprint",1],["maroon-formal","#a0643f","sarees banarsi",1],["green-chiffon-banarsi","#d2c4aa","sarees banarsi",1],["ethnic-bangles","#2c2724","jewellery",0],["hair-accessory","#b9a083","jewellery",0]];
   const cutFile={"noor-e-afshan":"white-sofa","mango-cotton":"mustard-garden","lavender-dream":"purple-brick","azure-elegance":"blue-brick","maroon-formal":"red-arch","green-chiffon-banarsi":"green-lamp"};
-  const tile=([id,bg,tags,cut])=>{const p=byId(id);return `<a class="tr-tile rv" data-f="${tags}" href="product.html?id=${id}"><div class="bg" style="--tb:${bg}"><img class="cover" src="images/products/${id}.jpg?v=2" alt="${esc(p.name)}" loading="lazy"><span class="ic"><i>${heart}</i><i>${bag}</i></span></div><div class="cap"><b>${esc(p.name)}</b><span>${p.price?money(p.price):"On request"}</span></div></a>`};
+  const tile=([id,bg,tags,cut])=>{const p=byId(id);return `<a class="tr-tile rv" data-f="${tags}" href="product.html?id=${id}"><div class="bg" style="--tb:${bg}"><img class="cover" src="images/products/${id}.jpg?v=hd" alt="${esc(p.name)}" loading="lazy"><span class="ic"><i>${heart}</i><i>${bag}</i></span></div><div class="cap"><b>${esc(p.name)}</b><span>${p.price?money(p.price):"On request"}</span></div></a>`};
   const faq=[["How long does delivery take?",`Estimated ${C.deliveryEstimate} across Pakistan.`],["Do you offer Cash on Delivery?","Yes, across Pakistan."],["Can I see more photos of a piece?","Message us on WhatsApp and we'll send more pictures."],["How do I pay online?",C.paymentNote]];
   return `
   <section class="tr-hero" id="hero" aria-label="Moorpankh">
@@ -143,7 +143,7 @@ pages.home = () => {
   <section class="tr-ban"><div class="pic">${I("heritage-2","Red sandstone heritage arcade","data-par")}</div><div class="in"><small>Lahore · Heritage</small><h2 class="tr-h2">Rooted in<br>heritage</h2><a class="btn gold mag" href="collections.html">View Collections →</a></div></section>
 
   <section class="tr-jew"><div class="tr-shop-head"><h2 class="tr-h2">Handmade<br>Jewellery</h2><a class="btn mag" href="jewellery.html">Shop Jewellery →</a></div>
-    <div class="row3">${[["earrings-peacock","Peacock earrings"],["bangles-hand","Handmade bangles"],["necklace-blue","Cowrie necklace"],["earrings-cowrie","Hand-painted earrings"]].map(j=>`<figure class="rv"><div class="pic"><img src="images/real/${j[0]}.jpg" alt="${j[1]}" loading="lazy"></div><figcaption>${j[1]}</figcaption></figure>`).join("")}</div></section>
+    <div class="row3">${[["earrings-peacock","Peacock earrings"],["bangles-hand","Handmade bangles"],["necklace-blue","Cowrie necklace"],["earrings-cowrie","Hand-painted earrings"]].map(j=>`<figure class="rv"><div class="pic"><img src="images/real/${j[0]}.jpg?v=hd" alt="${j[1]}" loading="lazy"></div><figcaption>${j[1]}</figcaption></figure>`).join("")}</div></section>
 
   <section class="tr-faq"><div><h2 class="tr-h2">Need<br>help?</h2></div><div class="mk-faq">${faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div></section>
 
