@@ -47,6 +47,7 @@ function addToCart(id,q=1,open=true){const p=byId(id);if(!p||!buyable(p)){toast(
  const it=cart.find(i=>i.id===id),max=p.stock==null?99:p.stock;if(it)it.qty=Math.min(max,it.qty+q);else cart.push({id,qty:Math.min(max,q)});saveCart();if(open)openDrawer("cart");else toast("Added to bag");return true}
 function toggleWish(id){wish=wish.includes(id)?wish.filter(w=>w!==id):[...wish,id];store.set("wish",wish);badges();$$(`[data-wish="${id}"]`).forEach(b=>b.classList.toggle("on",wish.includes(id)));toast(wish.includes(id)?"Saved":"Removed from saved")}
 const lines=()=>cart.map(i=>({p:byId(i.id),qty:i.qty})).filter(x=>x.p);
+const quoteMsg=()=>{const L=lines();const t=totals();return "Assalam o Alaikum Moorpankh! Please send me a quote for:\n\n"+L.map(x=>"• "+x.p.name+" × "+x.qty+" — "+money(x.p.price*x.qty)).join("\n")+"\n\nSubtotal: "+money(t.sub)+"\nDelivery: "+(t.ship?money(t.ship):"to be confirmed")+"\nTotal: "+money(t.total)+"\n\nPlease confirm availability, delivery charges and payment details. Thank you!"};
 const totals=()=>{const sub=lines().reduce((a,x)=>a+x.p.price*x.qty,0);const ship=sub?C.shippingFee:0;return{sub,ship,total:sub+ship}};
 
 /* ---------- account (kept on this device only) ---------- */
@@ -98,7 +99,7 @@ function openDrawer(k){const map={cart:"#dCart",menu:"#dMenu",search:"#srch"};cl
 function closeAll(){$$(".drw.on,.srch.on,.scrim.on").forEach(e=>e.classList.remove("on"))}
 function renderCart(){const L=lines();const b=$("#cartBody"),f=$("#cartFoot");
  b.innerHTML=L.length?L.map(({p,qty})=>{const m=media(p);return `<div class="ci"><a class="ci-i ${m.cut||m.photos[0]?"":"ph"}" href="product.html?id=${p.id}">${thumbHTML(p)}</a><div><a class="ci-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="ci-p">${money(p.price)}</div><div class="qty"><button data-q="-" data-id="${p.id}" aria-label="Less">−</button><span>${qty}</span><button data-q="+" data-id="${p.id}" aria-label="More">+</button></div></div><div class="ci-r">${money(p.price*qty)}<button data-rm="${p.id}">Remove</button></div></div>`}).join(""):`<div class="cart-empty">${I.bag}Your bag is empty.</div>`;
- const t=totals();f.innerHTML=L.length?`<div class="tot"><span>Subtotal</span><span>${money(t.sub)}</span></div><small style="color:var(--mute);font-size:11px">Delivery: ${C.deliveryEstimate}. Cash on Delivery across Pakistan.</small><a class="btn pill" href="checkout.html">Checkout</a><a class="btn pill out" href="cart.html">View bag</a>`:`<a class="btn pill" href="collections.html">Continue shopping</a>`}
+ const t=totals();f.innerHTML=L.length?`<div class="tot"><span>Subtotal</span><span>${money(t.sub)}</span></div><small style="color:var(--mute);font-size:11px">Delivery: ${C.deliveryEstimate}. Cash on Delivery across Pakistan.</small><a class="btn pill wa" href="${waLink(quoteMsg())}" target="_blank" rel="noopener">Checkout on WhatsApp</a><a class="btn pill out" href="cart.html">View bag</a>`:`<a class="btn pill" href="collections.html">Continue shopping</a>`}
 
 /* ---------- search ---------- */
 const catThumb={best:"images/cut/red-arch.png",new:"images/cut/green-lamp.png",sarees:"images/cut/purple-brick.png",jewellery:"images/products/ethnic-bangles.jpg"};
@@ -115,7 +116,7 @@ pages.home=()=>{
  const L=lookbookItems();
  const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
- const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}" ${i?'loading="lazy"':""}>`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
+ const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}" ${i?'loading="lazy"':""}>`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a><div class="mh-dots" id="mhDots"></div></div></section>`;
  return mh+lb};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
@@ -214,8 +215,8 @@ pages.product=()=>{
 pages.wishlist=()=>{const l=wish.map(byId).filter(Boolean);return `<div class="ph-top"><h1>Saved Pieces</h1></div><section class="coll" style="padding-top:26px">${l.length?`<div class="grid">${l.map(p=>card(p)).join("")}</div>`:`<p class="empty">Nothing saved yet. <a class="link" href="collections.html" style="margin-left:8px">Browse collections</a></p>`}</section>`};
 
 const sumHTML=()=>{const t=totals();return `<div class="sumrow"><span>Subtotal</span><span>${money(t.sub)}</span></div><div class="sumrow"><span>Delivery</span><span>${t.ship?money(t.ship):"Confirmed on WhatsApp"}</span></div><div class="sumrow t"><span>Total</span><span>${money(t.total)}</span></div>`};
-pages.cart=()=>{setTimeout(()=>{const draw=()=>{const L=lines();$("#cl").innerHTML=L.length?L.map(({p,qty})=>`<div class="ci"><a class="ci-i ${media(p).cut||media(p).photos[0]?"":"ph"}" href="product.html?id=${p.id}">${thumbHTML(p)}</a><div><a class="ci-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="ci-p">${money(p.price)}</div><div class="qty"><button data-q="-" data-id="${p.id}">−</button><span>${qty}</span><button data-q="+" data-id="${p.id}">+</button></div></div><div class="ci-r">${money(p.price*qty)}<button data-rm="${p.id}">Remove</button></div></div>`).join(""):`<div class="cart-empty">${I.bag}Your bag is empty.</div>`;$("#cs").innerHTML=sumHTML();$("#co").style.display=L.length?"":"none"};window.__cartDraw=draw;draw()});
- return `<div class="pg-wrap"><p class="pg-title">Your Bag</p><div class="two"><div id="cl"></div><aside class="card"><div id="cs"></div><a id="co" class="btn pill" style="width:100%;margin-top:18px" href="checkout.html">Checkout</a></aside></div></div>`};
+pages.cart=()=>{setTimeout(()=>{const draw=()=>{const L=lines();$("#cl").innerHTML=L.length?L.map(({p,qty})=>`<div class="ci"><a class="ci-i ${media(p).cut||media(p).photos[0]?"":"ph"}" href="product.html?id=${p.id}">${thumbHTML(p)}</a><div><a class="ci-n" href="product.html?id=${p.id}">${esc(p.name)}</a><div class="ci-p">${money(p.price)}</div><div class="qty"><button data-q="-" data-id="${p.id}">−</button><span>${qty}</span><button data-q="+" data-id="${p.id}">+</button></div></div><div class="ci-r">${money(p.price*qty)}<button data-rm="${p.id}">Remove</button></div></div>`).join(""):`<div class="cart-empty">${I.bag}Your bag is empty.</div>`;$("#cs").innerHTML=sumHTML();$("#co").style.display=L.length?"":"none";$("#co").href=waLink(quoteMsg())};window.__cartDraw=draw;draw()});
+ return `<div class="pg-wrap"><p class="pg-title">Your Bag</p><div class="two"><div id="cl"></div><aside class="card"><div id="cs"></div><a id="co" class="btn pill wa" style="width:100%;margin-top:18px" href="#" target="_blank" rel="noopener">Checkout on WhatsApp</a></aside></div></div>`};
 
 pages.checkout=()=>{const u=me();
  setTimeout(()=>{const f=$("#cf");if(!f)return;$("#cks").innerHTML=lines().map(({p,qty})=>`<div class="sumrow"><span>${esc(p.name)} × ${qty}</span><span>${money(p.price*qty)}</span></div>`).join("")+sumHTML();
@@ -223,7 +224,7 @@ pages.checkout=()=>{const u=me();
    const order={no:"MP"+Date.now().toString().slice(-7),date:new Date().toISOString(),email:(me()||{}).email||d.email||"",customer:d,items:L.map(x=>({id:x.p.id,name:x.p.name,price:x.p.price,qty:x.qty})),...t,status:"Pending confirmation"};
    const all=store.get("orders",[]);all.push(order);store.set("orders",all);
    const msg=`New Moorpankh order ${order.no}\n\n`+order.items.map(i=>`• ${i.name} × ${i.qty} — ${money(i.price*i.qty)}`).join("\n")+`\n\nTotal: ${money(t.total)}\nPayment: ${d.pay}\n\nName: ${d.name}\nPhone: ${d.phone}\nAddress: ${d.address}, ${d.city}${d.postal?" "+d.postal:""}\n${d.notes?"Notes: "+d.notes:""}`;
-   cart=[];saveCart();$("#app").innerHTML=`<div class="pg-wrap" style="text-align:center;padding-top:90px"><p class="pg-title">Order received</p><h1 style="font:italic 600 clamp(2rem,5vw,3.6rem)/1.1 var(--serif);margin-bottom:18px">Thank you, ${esc(d.name.split(" ")[0])}.</h1><p style="max-width:52ch;margin:0 auto 26px;color:#5f5a52">Your order <b>${order.no}</b> is saved. <b>Tap the button below to send it to us on WhatsApp</b>; we confirm every order there${d.pay==="Cash on Delivery"?" and you pay on delivery":", along with payment details"}. Estimated delivery: ${C.deliveryEstimate}.</p><a class="btn pill wa" href="${waLink(msg)}" target="_blank" rel="noopener">Send order on WhatsApp</a><p style="margin-top:26px"><a class="link" href="collections.html">Continue shopping</a></p></div>`;scrollTo(0,0)}});
+   cart=[];saveCart();window.open(waLink(msg),"_blank","noopener");$("#app").innerHTML=`<div class="pg-wrap" style="text-align:center;padding-top:90px"><p class="pg-title">Order received</p><h1 style="font:italic 600 clamp(2rem,5vw,3.6rem)/1.1 var(--serif);margin-bottom:18px">Thank you, ${esc(d.name.split(" ")[0])}.</h1><p style="max-width:52ch;margin:0 auto 26px;color:#5f5a52">Your order <b>${order.no}</b> is saved. <b>Tap the button below to send it to us on WhatsApp</b>; we confirm every order there${d.pay==="Cash on Delivery"?" and you pay on delivery":", along with payment details"}. Estimated delivery: ${C.deliveryEstimate}.</p><a class="btn pill wa" href="${waLink(msg)}" target="_blank" rel="noopener">Send order on WhatsApp</a><p style="margin-top:26px"><a class="link" href="collections.html">Continue shopping</a></p></div>`;scrollTo(0,0)}});
  return `<div class="pg-wrap"><p class="pg-title">Checkout</p>${lines().length?`<div class="two"><form id="cf" class="form card"><p class="up" style="color:var(--mute)">Delivery details</p>
   <div class="g2"><label class="f">Full name<input name="name" required autocomplete="name" value="${esc(u?u.name:"")}"></label><label class="f">Phone / WhatsApp<input name="phone" type="tel" required pattern="[0-9+ \\-]{10,15}" autocomplete="tel" placeholder="03XX XXXXXXX" value="${esc(u?u.phone||"":"")}"></label></div>
   <label class="f">Email (optional)<input name="email" type="email" autocomplete="email" value="${esc(u?u.email:"")}"></label>
@@ -233,7 +234,7 @@ pages.checkout=()=>{const u=me();
   <p class="up" style="color:var(--mute);margin-top:6px">Payment</p>
   <label class="opt"><input type="radio" name="pay" value="Cash on Delivery" checked><span><b>Cash on Delivery</b><br>Available across Pakistan.</span></label>
   <label class="opt"><input type="radio" name="pay" value="Online transfer (JazzCash/Easypaisa/Bank)"><span><b>Online transfer</b><br>${esc(C.paymentNote)}</span></label>
-  <button class="btn pill" style="height:48px">Place order</button><small style="color:var(--mute)">Your details stay on your device and are sent only to Moorpankh via WhatsApp.</small></form>
+  <button class="btn pill wa" style="height:48px">Send order on WhatsApp</button><small style="color:var(--mute)">Your details stay on your device and are sent only to Moorpankh via WhatsApp.</small></form>
   <aside class="card"><p class="up" style="color:var(--mute);margin-bottom:10px">Your order</p><div id="cks"></div></aside></div>`:`<p class="empty">Your bag is empty. <a class="link" href="collections.html" style="margin-left:8px">Continue shopping</a></p>`}</div>`};
 
 pages.account=()=>{
@@ -284,7 +285,15 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
- if(pg==="home"){const sl=[...document.querySelectorAll("#mhHero .mh-s")];if(sl.length>1&&!matchMedia("(prefers-reduced-motion:reduce)").matches){let k=0;setInterval(()=>{if(document.hidden||innerWidth>900)return;sl[k].classList.remove("on");k=(k+1)%sl.length;sl[k].classList.add("on")},4200)}}
+ if(pg==="home"){const hero=$("#mhHero"),sl=[...document.querySelectorAll("#mhHero .mh-s")],dots=$("#mhDots");if(hero&&sl.length>1){let k=0,tm;
+  dots.innerHTML=sl.map((_,n)=>'<button aria-label="Photo '+(n+1)+'"'+(n?"":' class="on"')+' data-n="'+n+'"></button>').join("");
+  const go=n=>{sl[k].classList.remove("on");dots.children[k].classList.remove("on");k=(n+sl.length)%sl.length;sl[k].classList.add("on");dots.children[k].classList.add("on")};
+  const auto=()=>{clearInterval(tm);if(!matchMedia("(prefers-reduced-motion:reduce)").matches)tm=setInterval(()=>{if(!document.hidden&&innerWidth<=900)go(k+1)},4200)};
+  dots.onclick=e=>{const b=e.target.closest("button");if(b){go(+b.dataset.n);auto()}};
+  let x0=null,y0=0;hero.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  hero.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){go(k+(dx<0?1:-1));auto()}},{passive:true});
+  hero.addEventListener("click",e=>{if(e.target.closest("a,button"))return;const r=hero.getBoundingClientRect();go(k+(e.clientX>r.left+r.width/2?1:-1));auto()});
+  auto()}}
  featherCursor();
  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
  addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});

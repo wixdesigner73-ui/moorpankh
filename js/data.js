@@ -10,7 +10,7 @@
 window.MP_CONFIG = {
   brand: "Moorpankh",
   city: "Lahore, Pakistan",
-  whatsapp: "920000000000",          // <-- REPLACE with your number, country code first, no + (e.g. 923001234567)
+  whatsapp: "923164122741",          // +92 316 4122741
   instagram: "moorpankhpk",
   email: "hello@moorpankh.com",      // <-- replace
   currency: "PKR",

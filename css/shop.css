@@ -279,3 +279,8 @@ html.feather-cur.native-cur #cur{opacity:0!important}
 .ab-hero img{object-position:center 40%}
 .ab-hero h1{text-shadow:0 2px 24px rgba(0,0,0,.35)}
 .ab-hero::after{background:linear-gradient(180deg,rgba(25,15,10,.55),rgba(25,15,10,.12) 22%,rgba(25,15,10,.1) 55%,rgba(25,15,10,.4))}
+.mh-dots{position:absolute;z-index:3;left:0;right:0;bottom:84px;display:flex;justify-content:center;gap:4px}
+.mh-dots button{width:22px;height:22px;background:none;border:0;padding:0;position:relative;cursor:pointer}
+.mh-dots button::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(255,255,255,.5);transition:all .3s}
+.mh-dots button.on::after{background:#fff;width:20px;margin-left:-10px;border-radius:4px}
+.mh-hero{touch-action:pan-y}
