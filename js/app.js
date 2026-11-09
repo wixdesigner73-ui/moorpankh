@@ -84,69 +84,53 @@ const pages = {};
 
 pages.home = () => {
   const I=(f,alt,x="")=>`<img src="images/${f}.jpg" alt="${alt}" ${x}>`;
-  // Sample photos stand in for product photos on the home page only. Put a real photo at images/products/<id>.jpg and it replaces the sample automatically.
-  const thumb=(p,sample)=>`<img src="images/products/${p}.jpg" alt="${esc(byId(p).name)}" loading="lazy" onerror="this.onerror=null;this.src='images/${sample}.jpg'">`;
-  const feat=[["mango-cotton","model-palace"],["noor-e-afshan","hero-2"],["lavender-dream","model-red"],["azure-elegance","model-tree"]];
-  const side=[["maroon-formal","hero-3"],["green-chiffon-banarsi","model-green"],["ethnic-bangles","jewel-6"],["hair-accessory","jewel-7"]];
-  const svg={
-    saree:'<svg viewBox="0 0 40 40"><path d="M20 4c-3 0-5 2-5 5s2 4 5 4 5-1 5-4-2-5-5-5zM14 16c-2 8-4 14-5 20h22c-1-6-3-12-5-20M16 20c6 3 10 8 12 16"/></svg>',
-    jewel:'<svg viewBox="0 0 40 40"><path d="M8 8c0 14 5 20 12 20S32 22 32 8M20 28v4M17 32h6l-3 5z"/></svg>',
-    rtw:'<svg viewBox="0 0 40 40"><path d="M14 5l-6 8 5 3v21h14V16l5-3-6-8c-2 3-8 3-12 0z"/></svg>',
-    banarsi:'<svg viewBox="0 0 40 40"><path d="M20 4l14 16-14 16L6 20zM20 12l7 8-7 8-7-8z"/></svg>',
-    fabric:'<svg viewBox="0 0 40 40"><path d="M6 12c6-6 10 6 14 0s10 6 14 0M6 22c6-6 10 6 14 0s10 6 14 0M6 32c6-6 10 6 14 0s10 6 14 0"/></svg>',
-    hand:'<svg viewBox="0 0 40 40"><path d="M10 28V14a2 2 0 014 0v8M14 22V10a2 2 0 014 0v12M18 22V12a2 2 0 014 0v10M22 22v-6a2 2 0 014 0v14c0 5-4 8-8 8-5 0-8-3-9-6l-2-5"/></svg>',
-    truck:'<svg viewBox="0 0 40 40"><path d="M4 10h20v18H4zM24 16h8l5 6v6H24zM12 32a3 3 0 106 0 3 3 0 10-6 0M28 32a3 3 0 106 0 3 3 0 10-6 0"/></svg>',
-    cash:'<svg viewBox="0 0 40 40"><path d="M4 11h32v18H4zM20 14a6 6 0 100 12 6 6 0 000-12z"/></svg>'
-  };
+  const star='<svg class="tr-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.5 16.5 11.2 24 12 16.5 12.8 12.8 16.5 12 24 11.2 16.5 7.5 12.8 0 12 7.5 11.2 11.2 7.5 12 0Z"/></svg>';
+  const heart='<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6c-2.3 4.4-9.3 9-9.3 9z"/></svg>';
+  const bag='<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>';
+  const band=t=>`<div class="tr-band" aria-hidden="true"><div>${(t+" ").repeat(10)}</div></div>`;
+  const bandText='MOORPANKH <b>✦</b> NEW COLLECTION 2026 <b>✦</b> TRADITION, REDEFINED <b>✦</b>';
+  // product tiles: [id, tile colour, filter tags, cutout?]
+  const tiles=[["noor-e-afshan","#d3c0a2","sarees semi",1],["mango-cotton","#8a5a37","sarees cotton",1],["lavender-dream","#2c2724","sarees blockprint",1],["azure-elegance","#b9a083","sarees blockprint",1],["maroon-formal","#a0643f","sarees banarsi",1],["green-chiffon-banarsi","#d2c4aa","sarees banarsi",1],["ethnic-bangles","#2c2724","jewellery",0],["hair-accessory","#b9a083","jewellery",0]];
+  const cutFile={"noor-e-afshan":"white-sofa","mango-cotton":"mustard-garden","lavender-dream":"purple-brick","azure-elegance":"blue-brick","maroon-formal":"red-arch","green-chiffon-banarsi":"green-lamp"};
+  const tile=([id,bg,tags,cut])=>{const p=byId(id);return `<a class="tr-tile rv" data-f="${tags}" href="product.html?id=${id}"><div class="bg" style="--tb:${bg}">${cut?`<img class="cut" src="images/cut/${cutFile[id]}.png" alt="${esc(p.name)}" loading="lazy" onerror="this.onerror=null;this.className='cover';this.src='images/products/${id}.jpg'">`:`<img class="cover" src="images/products/${id}.jpg" alt="${esc(p.name)}" loading="lazy">`}<span class="ic"><i>${heart}</i><i>${bag}</i></span></div><div class="cap"><b>${esc(p.name)}</b><span>${p.price?money(p.price):"On request"}</span></div></a>`};
   const faq=[["How long does delivery take?",`Estimated ${C.deliveryEstimate} across Pakistan.`],["Do you offer Cash on Delivery?","Yes, across Pakistan."],["Can I see more photos of a piece?","Message us on WhatsApp and we'll send more pictures."],["How do I pay online?",C.paymentNote]];
   return `
-  <div class="mk">
-   <div class="mk-main">
-    <section class="mk-hero" id="hero" aria-label="Moorpankh">
-      <img class="mk-peacock-wm" src="images/peacock.png" alt="" aria-hidden="true">
-      <div class="mk-copy">
-        <p class="mk-eye">Timeless. Traditional. Yours.</p>
-        <h1 class="mk-h1"><span class="ln"><i>Vintage</i></span><span class="ln gold"><i>Elegance</i></span><span class="ln sm"><i>woven for you.</i></span></h1>
-        <p class="mk-p">Discover timeless vintage sarees and handcrafted treasures, where heritage meets the art of modern elegance. Made to be kept.</p>
-        <div class="mk-btns"><a class="btn mag" href="sarees.html">Explore Collection →</a><a class="btn ghost mag" href="${waLink('Hello Moorpankh! I would like some styling help.')}" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
-        <ul class="mk-trust"><li>${svg.truck}<span>Delivery across Pakistan<br><small>${C.deliveryEstimate}</small></span></li><li>${svg.cash}<span>Cash on Delivery<br><small>Pakistan-wide</small></span></li></ul>
-      </div>
-      <div class="mk-trio">
-        <figure class="t1"><div class="pic"><img src="images/real/blue-brick.jpg" alt="Hand block printed saree" data-par></div><figcaption><b>Hand Block Print</b><small>Printed by hand</small></figcaption></figure>
-        <figure class="t2"><div class="pic frame" id="harch"><canvas id="heroGL" aria-hidden="true"></canvas><img src="images/real/red-arch.jpg" alt="Model in a red banarsi saree" class="h-fb"></div><figcaption><b>Vintage Sarees</b><small>Banarsi, block print &amp; zari</small></figcaption></figure>
-        <figure class="t3"><div class="pic"><img src="images/real/white-sofa.jpg" alt="Noor e Afshan semi formal saree" data-par></div><figcaption><b>Semi Formal</b><small>Timeless. Graceful. Iconic.</small></figcaption></figure>
-      </div>
-    </section>
-    <div class="mk-orn" aria-hidden="true"><i></i><img src="images/peacock.png" alt=""><i></i></div>
-    <div class="mk-water" aria-hidden="true">Moorpankh Vintage Couture</div>
+  <section class="tr-hero" id="hero" aria-label="Moorpankh">
+    <div class="tr-tag"><i></i>#2026 COLLECTION</div>
+    <div class="tr-hwrap"><h1 class="tr-h1"><span class="ln"><i>Tradition,</i></span><span class="ln"><i>Redefined</i></span></h1>${star.replace('class="tr-star"','class="tr-star s1"')}${star.replace('class="tr-star"','class="tr-star s2"')}</div>
+    <div class="tr-row"><div class="tr-left"><p class="tr-sub">Vintage sarees and handmade jewellery, inspired by timeless South Asian craftsmanship.</p>
+    <div class="tr-stats"><div><b>+${P.length}</b><small>Pieces</small></div><div><b>COD</b><small>Across Pakistan</small></div></div></div>
+    <a class="tr-swatch" href="sarees.html" aria-label="New in"><div class="pic">${I("fabric-2","Silk fabric swirl")}</div><span class="rib">NEW IN</span></a></div>
+    <div class="tr-gold" aria-hidden="true"></div>
+    <img class="tr-model" src="images/cutout-model.png?v=4" alt="Model in a red banarsi saree">
+  </section>
+  ${band(bandText)}
 
-    <section class="mk-master"><div class="mk-mt"><h2 class="mk-h2">Masterpieces<br>in every<br>thread</h2><p>From hand block prints to heavy banarsi, every piece is chosen for its craft, so it can be worn for years.</p><a class="btn mag" href="story.html">Our Story</a></div>
-      <div class="mk-collage"><div class="pic c1"><img src="images/inset-left.jpg" alt="Model in a purple saree" onerror="this.onerror=null;this.src='images/real/purple-flow.jpg'"></div><div class="cut c2"><img src="images/cutout-model.png?v=4" alt="Model in a statement saree" onerror="this.onerror=null;this.src='images/model-palace.jpg';this.classList.add('fb')"></div><div class="pic c3"><img src="images/inset-jewel.jpg" alt="Handmade bangles" onerror="this.onerror=null;this.src='images/real/bangles-flat.jpg'"></div><a class="vm" href="sarees.html">View More →</a></div></section>
+  <section class="tr-about">
+    <div class="tr-ph rv"><div class="pic">${I("model-arch","Models in sarees beneath a heritage arch")}</div></div>
+    <div class="tr-about-t"><h2 class="tr-h2 split-line">Heritage &amp; Collection</h2>
+      <p class="rv">Welcome to Moorpankh, where vintage meets everyday elegance. Based in ${C.city}, we bring together hand block printed, banarsi and cotton sarees with handmade jewellery. Each piece is chosen for its craft and made to be worn for years.</p>
+      <p class="rv"><a class="btn mag" href="story.html">Our Story →</a></p></div>
+  </section>
 
-    <section class="mk-featured"><div class="mk-head"><small>Featured collection</small><a href="shop.html">View All Collection →</a></div>
-      <div class="mk-cards">${feat.map(([id,s])=>{const p=byId(id);return `<a class="mk-card rv" href="product.html?id=${id}"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name)}</b><small>${esc(p.sub)}</small><span class="mk-pr">${p.price?money(p.price):"On request"}<i>→</i></span></a>`}).join("")}</div></section>
+  <section class="tr-shop" id="shop">
+    <div class="tr-shop-head"><h2 class="tr-h2">For You</h2>
+      <div class="tr-chips" role="tablist">${[["all","All"],["sarees","Sarees"],["jewellery","Jewellery"],["banarsi","Banarsi"],["blockprint","Block Print"],["cotton","Cotton"]].map((c,i)=>`<button class="chip ${i?"":"on"}" data-c="${c[0]}">${c[1]}</button>`).join("")}</div></div>
+    <div class="tr-grid" id="trgrid">${tiles.map(tile).join("")}<a class="tr-tile viewall rv" href="shop.html"><div class="bg dark"><b>View<br>all<br>pieces</b><i class="go">→</i></div></a></div>
+  </section>
+  ${band("NEW COLLECTION 2026 <b>✦</b> TRADITION <b>✦</b> REDEFINED <b>✦</b> MOORPANKH <b>✦</b>")}
 
-    <section class="mk-banner"><div class="pic">${I("heritage-2","Red sandstone heritage arcade","data-par")}</div><div class="in"><small>Lahore · Heritage</small><h2 class="mk-h2">Rooted in<br>heritage</h2><p>Inspired by the arches, courtyards and palaces where these textiles were once worn.</p><a class="btn gold mag" href="collections.html">View Collections →</a></div></section>
+  <section class="tr-why"><h2 class="tr-h2 split-line">We are made by hand</h2>
+    <div class="tr-brands">${["Hand block printed","Banarsi weaves","Handmade jewellery","Cash on delivery",C.deliveryEstimate,"Order on WhatsApp"].map(t=>`<div class="rv"><span>${t}</span></div>`).join("")}</div></section>
 
-    <section class="mk-jstrip"><div class="mk-head"><small>Handmade jewellery</small><a href="jewellery.html">Shop Jewellery →</a></div>
-      <div class="row3">${[["jewel-4","Veils &amp; gold","Bridal"],["jewel-5","Statement necklaces","Neckpieces"],["jewel-7","Chains &amp; zari","Heirloom"]].map(j=>`<figure><a href="jewellery.html"><div class="pic">${I(j[0],j[1],"data-par")}</div><figcaption><b>${j[1]}</b><small>${j[2]}</small></figcaption></a></figure>`).join("")}</div></section>
-   </div>
+  <section class="tr-ban"><div class="pic">${I("heritage-2","Red sandstone heritage arcade","data-par")}</div><div class="in"><small>Lahore · Heritage</small><h2 class="tr-h2">Rooted in<br>heritage</h2><a class="btn gold mag" href="collections.html">View Collections →</a></div></section>
 
-   <aside class="mk-side">
-    <div class="mk-box mk-celeb"><div><h2 class="mk-h3">Outfits That<br>Celebrate You</h2><a class="btn mag" href="${waLink('Hello Moorpankh! Could you help me choose an outfit?')}" target="_blank" rel="noopener">Style Help →</a></div><div class="pic"><img src="images/real/mustard-garden.jpg" alt="Model in a mustard saree" data-par></div></div>
-    <div class="mk-cats">${[["saree","Sarees","Graceful elegance","sarees.html"],["jewel","Jewellery","Handmade","jewellery.html"],["rtw","Ready to Wear","Co-ords &amp; kaftans","shop.html?cat=suits"],["banarsi","Banarsi","Formal weaves","collections.html#banarsi"]].map(c=>`<a href="${c[3]}" class="rv">${svg[c[0]]}<b>${c[1]}</b><small>${c[2]}</small></a>`).join("")}</div>
+  <section class="tr-jew"><div class="tr-shop-head"><h2 class="tr-h2">Handmade<br>Jewellery</h2><a class="btn mag" href="jewellery.html">Shop Jewellery →</a></div>
+    <div class="row3">${[["earrings-peacock","Peacock earrings"],["bangles-hand","Handmade bangles"],["necklace-blue","Cowrie necklace"],["earrings-cowrie","Hand-painted earrings"]].map(j=>`<figure class="rv"><div class="pic"><img src="images/real/${j[0]}.jpg" alt="${j[1]}" loading="lazy"></div><figcaption>${j[1]}</figcaption></figure>`).join("")}</div></section>
 
-    <div class="mk-box"><div class="mk-head"><small>Featured pieces</small></div><div class="mk-mini">${side.map(([id,s])=>{const p=byId(id);return `<a href="product.html?id=${id}" class="rv"><div class="pic">${thumb(id,s)}</div><b>${esc(p.name.replace(/ Saree| Necklace/,""))}</b><small>${p.price?money(p.price):"On request"}</small></a>`}).join("")}</div></div>
+  <section class="tr-faq"><div><h2 class="tr-h2">Need<br>help?</h2></div><div class="mk-faq">${faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div></section>
 
-    <div class="mk-box mk-promise" id="mkdark"><img class="peacock" src="images/peacock.png" alt="" aria-hidden="true"><small>Our promise</small><h2 class="mk-h3">Premium quality.<br>Made with love.<br>Just for you.</h2>
-      <ul>${[["fabric","Beautiful fabrics"],["hand","Hand-finished"],["truck",C.deliveryEstimate],["cash","Cash on Delivery"]].map(f=>`<li>${svg[f[0]]}<span>${f[1]}</span></li>`).join("")}</ul><a class="btn gold mag" href="shop.html">Shop Now →</a></div>
-
-    <div class="mk-box"><div class="mk-head"><small>From the journal</small><a href="journal.html">View all →</a></div>
-      <div class="mk-stories"><a href="journal.html" class="rv"><div class="pic"><img src="images/real/blue-pink-chair.jpg" alt="Styling story" loading="lazy"></div><b>How to drape a banarsi saree</b></a><a href="journal.html" class="rv"><div class="pic"><img src="images/real/earrings-peacock.jpg" alt="Jewellery story" loading="lazy"></div><b>Mixing vintage jewellery with a plain saree</b></a></div></div>
-
-    <div class="mk-box mk-help"><small>Need help?</small><h2 class="mk-h3">We're here to help</h2><div class="mk-faq">${faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div><div class="pic">${I("heritage-1","Heritage arch","loading=\"lazy\"")}</div></div>
-   </aside>
-  </div>`;
+  <section class="tr-news"><h2 class="tr-h2">First to see<br>what's new</h2><form id="nf"><input type="email" required placeholder="Your email" aria-label="Email"><button class="btn">Subscribe</button></form></section>`;
 };
 
 const COLLECTIONS = {
@@ -369,6 +353,37 @@ function homeMock(delay){
   gsap.to(".mk-promise .peacock",{y:-14,duration:3.2,ease:"sine.inOut",yoyo:true,repeat:-1});
   gsap.to(".mk-peacock-wm",{yPercent:-12,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
 }
+function homeTR(delay){
+  const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
+  // hero intro
+  const tl=gsap.timeline({delay});
+  tl.fromTo(".tr-tag",{opacity:0,x:-30},{opacity:1,x:0,duration:.9,ease:"power3.out"},0)
+    .fromTo(".tr-h1 .ln i",{yPercent:118},{yPercent:0,duration:1.5,ease:"expo.out",stagger:.14},.1)
+    .fromTo(".tr-star",{scale:0,rotate:-90,opacity:0},{scale:1,rotate:0,opacity:1,duration:1.2,ease:"back.out(2)",stagger:.2},.9)
+    .fromTo(".tr-sub,.tr-stats",{opacity:0,y:28},{opacity:1,y:0,duration:1,stagger:.12,ease:"power3.out"},.7)
+    .fromTo(".tr-gold",{scaleY:0,transformOrigin:"bottom"},{scaleY:1,duration:1.2,ease:"expo.out"},.5)
+    .fromTo(".tr-swatch",{scale:.6,opacity:0,rotate:-8},{scale:1,opacity:1,rotate:0,duration:1.1,ease:"back.out(1.6)"},1)
+    .fromTo(".tr-model",{yPercent:12,opacity:0},{yPercent:0,opacity:1,duration:1.5,ease:"expo.out"},.6);
+  // sparkles keep pulsing
+  qa(".tr-star").forEach((s,i)=>gsap.to(s,{scale:1.25,rotate:i?-45:45,duration:2.2+i,ease:"sine.inOut",yoyo:true,repeat:-1}));
+  // scroll drift
+  gsap.to(".tr-h1 .ln:nth-child(1)",{xPercent:-5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
+  gsap.to(".tr-h1 .ln:nth-child(2)",{xPercent:5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
+  gsap.to(".tr-model",{yPercent:-5,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
+  gsap.to(".tr-swatch",{yPercent:-18,rotate:4,ease:"none",scrollTrigger:{trigger:"#hero",start:"top top",end:"bottom top",scrub:true}});
+  // marquee speed follows scroll
+  qa(".tr-band div").forEach((b,i)=>gsap.to(b,{xPercent:i?20:-20,ease:"none",scrollTrigger:{trigger:b.parentNode,start:"top bottom",end:"bottom top",scrub:true}}));
+  // about photo reveal
+  gsap.fromTo(".tr-ph .pic",{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)",duration:1.4,ease:"expo.out",scrollTrigger:{trigger:".tr-ph",start:"top 82%",once:true}});
+  // product tiles: hover lift on the cut-out + filter chips
+  qa(".tr-tile:not(.viewall)").forEach(t=>{const c=t.querySelector("img");t.addEventListener("mouseenter",()=>gsap.to(c,{y:-10,scale:1.04,duration:.5,ease:"power3.out"}));t.addEventListener("mouseleave",()=>gsap.to(c,{y:0,scale:1,duration:.6,ease:"power3.out"}))});
+  const chips=qa(".tr-chips .chip");
+  chips.forEach(ch=>ch.addEventListener("click",()=>{chips.forEach(x=>x.classList.toggle("on",x===ch));const f=ch.dataset.c;
+    qa("#trgrid .tr-tile:not(.viewall)").forEach(t=>{const show=f==="all"||t.dataset.f.split(" ").includes(f);gsap.to(t,{opacity:show?1:0,scale:show?1:.92,duration:.4,onStart:()=>{if(show)t.style.display=""},onComplete:()=>{if(!show)t.style.display="none"}})});}));
+  document.querySelectorAll(".tr-brands>div,.tr-ban,.tr-jew figure,.tr-tile").forEach(e=>e.classList.add("rv"));
+  reveal();
+  gsap.from(".tr-ban .tr-h2",{yPercent:40,opacity:0,duration:1.3,ease:"expo.out",scrollTrigger:{trigger:".tr-ban",start:"top 70%",once:true}});
+}
 function MP_start(pg){
   const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches||location.search.includes("nomotion");
   const pre=document.createElement("div");
@@ -399,7 +414,7 @@ function MP_start(pg){
   $$(".split-line").forEach(el=>{splitWords(el);gsap.from($$(".w i",el),{yPercent:115,duration:1.2,ease:"expo.out",stagger:.07,scrollTrigger:{trigger:el,start:"top 88%",once:true}})});
   $$("img[data-par]").forEach(im=>{ const box=im.closest(".pic")||im.parentElement; if(box.closest(".hs-i")) return;
     gsap.fromTo(im,{yPercent:-9,scale:1.18},{yPercent:9,scale:1.18,ease:"none",scrollTrigger:{trigger:box,start:"top bottom",end:"bottom top",scrub:true}}) });
-  if(pg==="home") homeMock(delay);
+  if(pg==="home") homeTR(delay);
   window.addEventListener("load",()=>ScrollTrigger.refresh());
   pointer();
 }
