@@ -113,7 +113,7 @@ const latest=()=>{const a=[...COL.new,...P.filter(hasPic).map(p=>p.id)];return [
 const lookbookItems=()=>P.filter(p=>media(p).cut);
 pages.home=()=>{
  const L=lookbookItems();
- const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-hint">Scroll</div></div>
+ const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
  const mh=`<section class="mh"><div class="mh-hero"><img src="images/hero-3.jpg" alt="Model in a vintage banarsi saree"><a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
  return mh+lb};function initLookbook(){
@@ -132,15 +132,19 @@ pages.home=()=>{
   if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
  function go(n){if(busy||n<0||n>=L.length||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
+ $("#lbPrev").onclick=()=>go(a-1);$("#lbNext").onclick=()=>go(a+1);
  els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
- let locked=false,lastT=0,lastW=0;
- addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2)return;
+ let locked=false,lastT=0,acc=0,lastW=0;
+ addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2||e.ctrlKey)return;
+  const unit=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;
+  const d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*unit;if(!d)return;
+  e.preventDefault();                                    // home never scrolls the page itself
   const now=Date.now(),gap=now-lastW;lastW=now;
-  const dir=e.deltaY>18?1:e.deltaY<-18?-1:0;if(!dir)return;
-  const can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can)return;
-  e.preventDefault();
-  if(locked&&now-lastT>650&&gap>110)locked=false;   // new deliberate scroll after the last step finished
-  if(locked)return;locked=true;lastT=now;go(a+dir)},{passive:false});
+  const dir=d>0?1:-1,can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can){acc=0;return}
+  if(locked){ if(now-lastT>700&&gap>110)locked=false; else return }   // one glide = one step; unlock after a pause
+  if(gap>220||Math.sign(acc)!==dir)acc=0;acc+=d;         // add up tiny trackpad deltas
+  if(Math.abs(acc)<45)return;
+  locked=true;lastT=now;acc=0;go(a+dir)},{passive:false});
  addEventListener("keydown",e=>{if(innerWidth<=900||scrollY>2||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight"||e.key==="ArrowDown")go(a+1);if(e.key==="ArrowLeft"||e.key==="ArrowUp")go(a-1)});
  let sx=null;stage.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});stage.addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(a+(dx<0?1:-1));sx=null});
 }
