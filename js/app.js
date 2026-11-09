@@ -31,9 +31,12 @@ function toast(m){let t=$(".toast");if(!t){t=document.createElement("div");t.cla
   t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600)}
 
 /* ---------- reusable bits ---------- */
+const CUT={"noor-e-afshan":["white-sofa","#d3c0a2"],"mango-cotton":["mustard-garden","#8a5a37"],"lavender-dream":["purple-brick","#2c2724"],"azure-elegance":["blue-brick","#b9a083"],"maroon-formal":["red-arch","#a0643f"],"green-chiffon-banarsi":["green-lamp","#d2c4aa"]};
 const ph = (p,i=0,cls="")=>{
+  if(i===0&&CUT[p.id]&&!cls.includes("raw")) return `<div class="ph cutph ${cls}" style="--tb:${CUT[p.id][1]}"><img class="cut" src="images/cut/${CUT[p.id][0]}.png?v=2" alt="${esc(p.name)}" loading="lazy"></div>`;
   const src=`images/products/${p.id}${i?"-"+(i+1):""}.jpg`;
-  return `<div class="ph ${cls}" style="--c1:${p.c1};--c2:${p.c2}"><span>${esc(p.name)}</span><img src="${src}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()"></div>`;
+  const lum=(h=>{const n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255})(p.c1||"#888888");
+  return `<div class="ph ${lum>.62?"lt ":""}${cls}" style="--c1:${p.c1};--c2:${p.c2}"><span>${esc(p.name)}</span><img src="${src}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()"></div>`;
 };
 const slot = (name,label,c1="#8d9b5a",c2="#e4e8c4",cls="")=>`<div class="ph ${cls}" style="--c1:${c1};--c2:${c2}"><span>${label}</span><img src="images/${name}" alt="${esc(label)}" onerror="this.remove()"></div>`;
 const heartSvg='<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6c-2.3 4.400-9.300 9-9.300 9z"/></svg>';
@@ -176,10 +179,11 @@ pages.product = () => {
     $("#wl").onclick=()=>{toggleWish(p.id);$("#wl").textContent=wish.includes(p.id)?"♥ In wishlist":"♡ Wishlist"};
     const z=$(".zoom"); z.onclick=()=>z.classList.toggle("z");
     z.onmousemove=e=>{if(!z.classList.contains("z"))return;const r=z.getBoundingClientRect();z.firstElementChild.style.transformOrigin=`${(e.clientX-r.left)/r.width*100}% ${(e.clientY-r.top)/r.height*100}%`};
-    $$(".thumbs .ph").forEach((t,i)=>t.onclick=()=>{$$(".thumbs .ph").forEach(x=>x.classList.toggle("on",x===t));z.innerHTML=ph(p,i);gsapIn(z)});
+    $$(".thumbs .ph").forEach((t,i)=>{if(i>0){const im=t.querySelector("img");if(!im){t.remove();return}im.addEventListener("error",()=>t.remove());setTimeout(()=>{if(!im.complete||!im.naturalWidth)t.remove()},1500)}});
+    $$(".thumbs .ph").forEach((t,i)=>t.onclick=()=>{$$(".thumbs .ph").forEach(x=>x.classList.toggle("on",x===t));z.innerHTML=ph(p,i,"raw");gsapIn(z)});
   });
   const orderMsg=`Hello Moorpankh! I'd like to order / enquire about: ${p.name}${p.price?" ("+money(p.price)+")":""}. ${location.href}`;
-  return `<section class="wrap pdp"><div class="gal"><div class="thumbs">${[0,1,2].map(i=>ph(p,i,i?"":"on")).join("")}</div><div class="zoom" aria-label="Zoom image">${ph(p,0)}</div></div>
+  return `<section class="wrap pdp"><div class="gal"><div class="thumbs">${[0,1,2].map(i=>ph(p,i,i?"raw":"raw on")).join("")}</div><div class="zoom" aria-label="Zoom image">${ph(p,0,"raw")}</div></div>
    <div><p class="eyebrow">${esc(p.sub)} · ${{sarees:"Vintage Saree",suits:"Ready to wear",jewellery:"Jewellery"}[p.cat]}</p><h1>${esc(p.name)}</h1>
    <div class="pr">${p.price?money(p.price):"Price on request"}</div><span class="stock ${p.stock===0?"out":""}">${stockText(p)}</span>
    <p class="lead">${esc(p.desc)}</p>

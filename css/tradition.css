@@ -130,3 +130,48 @@ footer .copy{border-top-color:rgba(255,255,255,.14)}
   .tr-jew .row3{grid-template-columns:repeat(2,1fr)}
   .tr-tile .cap{flex-direction:column;gap:2px}
 }
+
+/* ===== inner pages in the same language ===== */
+.page-top{min-height:56vh;border-bottom:14px solid var(--gold)}
+.page-top .eyebrow{display:inline-flex;align-self:flex-start;border:1.5px solid #fbf6ea;border-radius:99px;padding:5px 16px;color:#fbf6ea;font-weight:600;letter-spacing:.14em}
+.page-top .display{font-size:clamp(3.2rem,12vw,12rem);line-height:.86;letter-spacing:-.05em;margin-top:18px}
+.page-top .display::after{content:"✦";color:var(--gold);font-size:.42em;margin-left:.2em;vertical-align:top;display:inline-block;transform:translateY(.2em)}
+/* product cards = home tiles */
+.grid{gap:clamp(22px,2.6vw,40px) 18px}
+@media(min-width:900px){#pg .card-p:nth-child(even){margin-top:0}}
+.card-p .ph{border-radius:26px;aspect-ratio:4/4.7;background:var(--c1,#b9a083);display:flex;align-items:flex-end;justify-content:center}
+.card-p .ph::before,.card-p .ph::after{display:none}
+.card-p .ph span{position:absolute;inset:0;display:flex;align-items:flex-end;padding:20px;font:900 clamp(1.6rem,2.4vw,2.4rem)/.9 var(--serif);text-transform:uppercase;letter-spacing:-.04em;color:rgba(255,255,255,.92);z-index:1}
+.card-p .ph img{z-index:3}
+.cutph{background:var(--tb)!important}
+.cutph .cut{position:relative!important;height:93%;width:auto!important;max-width:90%;inset:auto!important;object-fit:contain!important;filter:drop-shadow(0 14px 14px rgba(0,0,0,.25));transition:transform .6s var(--ease)}
+.card-p:hover .cutph .cut{transform:translateY(-10px) scale(1.04)}
+.card-p h3{font:800 .76rem var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
+.card-p .sub{font-size:.6rem}
+.price{font:500 .8rem var(--sans);color:var(--ink)}
+.card-p .meta{align-items:flex-start}
+.heart{background:#fbf6ea}
+.tag{background:var(--gold);color:var(--ink);font-weight:700;border-radius:99px;padding:5px 12px}
+/* toolbar */
+.toolbar{border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);padding:14px 0;margin-bottom:40px}
+.chip{border-radius:99px;box-shadow:inset 0 0 0 1.5px var(--ink);font-weight:600}
+.chip.on,.chip:hover{background:var(--gold);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.toolbar select{border:1.5px solid var(--ink);background:transparent}
+/* product page */
+.pdp h1{font:900 clamp(2.8rem,6.4vw,6.4rem)/.86 var(--serif);text-transform:uppercase;letter-spacing:-.045em;color:var(--ink)}
+.pdp .pr{font:800 2rem var(--serif);color:var(--ink)}
+.pdp .eyebrow{display:inline-block;border:1.5px solid var(--ink);border-radius:99px;padding:4px 14px;color:var(--ink);font-weight:600}
+.stock{background:var(--gold);color:var(--ink);font-weight:600;border-radius:99px;padding:6px 16px}
+.zoom{border-radius:30px}
+.zoom .ph{border-radius:30px;aspect-ratio:3/4}
+.thumbs .ph{border-radius:14px}
+.thumbs .ph.on{outline:2px solid var(--ink);outline-offset:2px}
+.qty{border:1.5px solid var(--ink);border-radius:99px;background:transparent}
+.facts{border-top:1.5px solid var(--ink)}.facts details{border-bottom:1.5px solid var(--ink)}
+.cart-row .ph{border-radius:14px}
+.sum{border-radius:26px;background:#fbf6ea}
+.prose h2{font:900 2.2rem var(--serif);text-transform:uppercase;letter-spacing:-.03em;color:var(--ink)}
+/* sparkle + band on every inner page, above footer */
+main#app::after{content:"";display:block}
+.card-p .ph.lt span{color:var(--ink)}
+.card-p .ph span{font-size:clamp(1.25rem,1.8vw,1.85rem);overflow:hidden;line-height:.92;padding:18px;align-items:flex-end}
