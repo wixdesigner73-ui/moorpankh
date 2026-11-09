@@ -13,7 +13,7 @@ const CATS=[["all","View All"],["best","Best Sellers"],["new","New Arrivals"],["
 const inCat=(p,c)=>c==="all"||(c==="best"?COL.best.includes(p.id):c==="new"?COL.new.includes(p.id):p.cat===c);
 
 /* ---------- media ---------- */
-function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=4":null,photos}}
+function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=hd`);return{cut:m.cut?m.cut+"?v=6":null,photos}}
 const hasPic=p=>{const m=media(p);return !!(m.cut||m.photos.length)};
 const MARK='<img src="images/peacock.png" alt="" aria-hidden="true">';
 function thumbHTML(p){const m=media(p);return m.cut?`<img src="${m.cut}" alt="${esc(p.name)}">`:m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
@@ -120,17 +120,23 @@ pages.home=()=>{
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
  const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
+ const N=L.length,side=new Array(N).fill("");
  function layout(){const H=stage.clientHeight*.76,W=stage.clientWidth;
-  els.forEach((el,i)=>{const d=i-a;let k;
-   if(d===0)k=0;else if(d<0&&d>=-3)k=-d;else k=null;
-   if(k!==null){el.style.height=(H*S[k])+"px";el.style.width=(H*S[k]*.72)+"px";el.style.left=(W*X[k])+"px";el.style.bottom=B[k]+"px";el.style.opacity=O[k];el.style.zIndex=10-k;el.style.pointerEvents=k?"auto":"none";el.style.filter=k>=2?"grayscale(.35)":"none"}
-   else if(d>0){el.style.height=(H*1.06)+"px";el.style.width=(H*1.06*.72)+"px";el.style.left=(W*.92)+"px";el.style.bottom=(B[0]-20)+"px";el.style.opacity=0;el.style.zIndex=11;el.style.pointerEvents="none";el.style.filter="none"}
-   else{el.style.height=(H*.25)+"px";el.style.width=(H*.14)+"px";el.style.left=(W*-.05)+"px";el.style.bottom=B[3]+"px";el.style.opacity=0;el.style.pointerEvents="none"}});
-  $("#lbCount").textContent=String(a+1).padStart(2,"0")+" / "+String(L.length).padStart(2,"0")}
+  els.forEach((el,i)=>{const d=((i-a)%N+N)%N;          // 0 = front, N-1..N-3 = the three on the left (wraps round)
+   let k=d===0?0:(d>=N-3&&d<N)?N-d:null;
+   const st=el.style;
+   if(k!==null){st.height=(H*S[k])+"px";st.width=(H*S[k]*.72)+"px";st.left=(W*X[k])+"px";st.bottom=B[k]+"px";st.opacity=O[k];st.zIndex=10-k;st.pointerEvents=k?"auto":"none";st.filter=k>=2?"grayscale(.35)":"none";side[i]=""}
+   else{const left=(N>=5&&d===N-4);const ns=left?"L":"R";
+    if(side[i]&&side[i]!==ns){st.transition="none"}      // jump unseen across the screen (invisible) instead of flying over it
+    if(left){st.height=(H*.25)+"px";st.width=(H*.14)+"px";st.left=(W*-.05)+"px";st.bottom=B[3]+"px";st.opacity=0;st.zIndex=1}
+    else{st.height=(H*1.06)+"px";st.width=(H*1.06*.72)+"px";st.left=(W*.92)+"px";st.bottom=(B[0]-20)+"px";st.opacity=0;st.zIndex=11}
+    st.pointerEvents="none";st.filter="none";side[i]=ns;
+    if(st.transition==="none"){void el.offsetWidth;st.transition=""}}});
+  $("#lbCount").textContent=String(a+1).padStart(2,"0")+" / "+String(N).padStart(2,"0")}
  function panel(first){const p=L[a],m=media(p),box=$("#lbIn");
   const fill=()=>{box.innerHTML=`<div class="lb-thumb ${m.cut?"":"ph"}">${thumbHTML(p)}</div><h2 class="lb-n">${esc(p.name)}</h2><p class="lb-d">${esc(p.desc)}</p><div class="lb-p">${priceTxt(p)}</div><a class="btn" href="product.html?id=${p.id}">Shop The Look</a>`;box.classList.remove("out")};
   if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
- function go(n){if(busy||n<0||n>=L.length||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
+ function go(n){n=((n%N)+N)%N;if(busy||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
  $("#lbPrev").onclick=()=>go(a-1);$("#lbNext").onclick=()=>go(a+1);
  els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
@@ -140,7 +146,7 @@ pages.home=()=>{
   const d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*unit;if(!d)return;
   e.preventDefault();                                    // home never scrolls the page itself
   const now=Date.now(),gap=now-lastW;lastW=now;
-  const dir=d>0?1:-1,can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can){acc=0;return}
+  const dir=d>0?1:-1;
   if(locked){ if(now-lastT>700&&gap>110)locked=false; else return }   // one glide = one step; unlock after a pause
   if(gap>220||Math.sign(acc)!==dir)acc=0;acc+=d;         // add up tiny trackpad deltas
   if(Math.abs(acc)<45)return;
