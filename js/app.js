@@ -84,6 +84,8 @@ function chrome(){
  <div class="srch" id="srch" role="dialog" aria-label="Search"><div class="srch-row"><div class="srch-in"><input id="sq" placeholder="Search here..." aria-label="Search" autocomplete="off">${I.search}</div><button class="drw-x" data-close aria-label="Close search">${I.x}</button></div><div id="sBody"></div></div>
  <nav class="mnav" aria-label="Quick"><a href="index.html" class="${pg==="home"?"on":""}" aria-label="Home">${I.home}</a><button id="sBtn2" aria-label="Search">${I.search}</button><a href="account.html" class="${pg==="account"?"on":""}" aria-label="Account">${I.user}</a><a href="collections.html" class="${NAV[pg]==="collections"?"on":""}" aria-label="Collections">${I.film}</a></nav>`}
 function footer(){
+ const fab=`<a class="wa-fab" href="${waLink("Hello Moorpankh! I would like some help.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${WAFAB}</a>`;
+ if(pg==="home")return fab;
  return `<footer class="ft"><div class="ft-g"><div><h6>Inner Circle</h6><form class="ft-news" id="nf"><input type="email" required placeholder="Email" aria-label="Email"><button aria-label="Subscribe">→</button></form><h6>Customer Support</h6><div class="ft-soc"><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a><a href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="mailto:${C.email}" aria-label="Email">${I.mail}</a></div></div>
  <div><h6>Editorial</h6><ul><li><a href="index.html">The Lookbook</a></li><li><a href="about.html">About Us</a></li><li><a href="account.html">My Account</a></li><li><a href="account.html#orders">Order History</a></li></ul></div>
  <div><h6>Curations</h6><ul><li><a href="collections.html">All Products</a></li><li><a href="collections.html?cat=sarees">Vintage Sarees</a></li><li><a href="collections.html?cat=jewellery">Handmade Jewellery</a></li><li><a href="collections.html?cat=new">New Arrivals</a></li></ul></div>
@@ -114,9 +116,7 @@ pages.home=()=>{
  const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-hint">Scroll</div></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
  const mh=`<section class="mh"><div class="mh-hero"><img src="images/hero-3.jpg" alt="Model in a vintage banarsi saree"><a class="mh-cta glass" href="collections.html">Shop Now</a></div></section>`;
- return mh+lb+`<section class="sec"><div class="sec-h"><h2>Latest Drop</h2><a class="link" href="collections.html?cat=new">Discover more</a></div><div class="grid">${latest().map(p=>card(p)).join("")}</div></section>
- <div class="sec-cta"><a class="btn" href="collections.html">Shop Now</a></div>`};
-function initLookbook(){
+ return mh+lb};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
  const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
@@ -133,13 +133,14 @@ function initLookbook(){
  function go(n){if(busy||n<0||n>=L.length||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
  els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
- let locked=false,idle=null,lastT=0;
+ let locked=false,lastT=0,lastW=0;
  addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2)return;
+  const now=Date.now(),gap=now-lastW;lastW=now;
   const dir=e.deltaY>18?1:e.deltaY<-18?-1:0;if(!dir)return;
-  const can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can)return;   // at either end: let the page scroll normally
+  const can=(dir>0&&a<L.length-1)||(dir<0&&a>0);if(!can)return;
   e.preventDefault();
-  clearTimeout(idle);idle=setTimeout(()=>{if(Date.now()-lastT>600)locked=false},170);   // a flick is over once wheel events pause
-  if(locked)return;locked=true;lastT=Date.now();go(a+dir)},{passive:false});
+  if(locked&&now-lastT>650&&gap>110)locked=false;   // new deliberate scroll after the last step finished
+  if(locked)return;locked=true;lastT=now;go(a+dir)},{passive:false});
  addEventListener("keydown",e=>{if(innerWidth<=900||scrollY>2||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight"||e.key==="ArrowDown")go(a+1);if(e.key==="ArrowLeft"||e.key==="ArrowUp")go(a-1)});
  let sx=null;stage.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});stage.addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(a+(dx<0?1:-1));sx=null});
 }
@@ -253,8 +254,8 @@ function boot(){
  document.body.insertAdjacentHTML("afterbegin",chrome());
  const app=$("#app");app.innerHTML=(pages[pg]||pages.home)();app.insertAdjacentHTML("afterend",footer());
  badges();
- const hd=$("#hd"),top=$("#toTop"),onS=()=>{hd.classList.toggle("solid",scrollY>40);top.classList.toggle("on",scrollY>500)};onS();addEventListener("scroll",onS,{passive:true});
- top.onclick=()=>scrollTo({top:0,behavior:"smooth"});
+ const hd=$("#hd"),top=$("#toTop"),onS=()=>{hd.classList.toggle("solid",scrollY>40);top&&top.classList.toggle("on",scrollY>500)};onS();addEventListener("scroll",onS,{passive:true});
+ if(top)top.onclick=()=>scrollTo({top:0,behavior:"smooth"});
  $("#scrim").onclick=closeAll;
  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeAll();const l=$("#lbx");l&&l.classList.remove("on")}});
  document.addEventListener("click",e=>{
@@ -270,7 +271,7 @@ function boot(){
   const a=t.closest("a[href]");if(a&&!a.target&&a.origin===location.origin&&!e.metaKey&&!e.ctrlKey&&a.pathname!==location.pathname){e.preventDefault();document.body.classList.add("leaving");setTimeout(()=>location.href=a.href,190)}
  });
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
- const nf=$("#nf");nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
+ const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add("ready")));
  addEventListener("pageshow",e=>{if(e.persisted){document.body.classList.remove("leaving");document.body.classList.add("ready")}});
