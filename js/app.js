@@ -110,7 +110,7 @@ function renderSearch(q){const body=$("#sBody");q=q.trim().toLowerCase();
 /* ---------- pages ---------- */
 const pages={};
 const latest=()=>{const a=[...COL.new,...P.filter(hasPic).map(p=>p.id)];return [...new Set(a)].map(byId).filter(Boolean).slice(0,4)};
-const lookbookItems=()=>P.filter(p=>media(p).cut);
+const lookbookItems=()=>P.filter(p=>media(p).cut&&(MEDIA[p.id]||{}).hero!==false);
 pages.home=()=>{
  const L=lookbookItems();
  const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>

@@ -84,7 +84,7 @@ window.MP_PRODUCTS = [
 window.MP_MEDIA = {
   "frida-chiffon": { photos:6 },
   "viva-la-vida": { photos:6 },
-  "lavender-dream": { photos:4, cut:"images/cut/lavender-dream.png" },
+  "lavender-dream": { photos:4, cut:"images/cut/lavender-dream.png", hero:false },
   "azure-elegance": { photos:4, cut:"images/cut/blue-brick.png" },
   "noor-e-afshan": { photos:6, cut:"images/cut/white-sofa.png" },
   "white-plum-cotton": { photos:4 },
@@ -93,7 +93,7 @@ window.MP_MEDIA = {
   "rust-banarsi": { photos:6, cut:"images/cut/mustard-garden.png" },
   "black-banarsi": { photos:6, cut:"images/cut/black-banarsi.png" },
   "green-chiffon-banarsi": { photos:6, cut:"images/cut/green-lamp.png" },
-  "mauve-banarsi": { photos:6, cut:"images/cut/mauve-banarsi.png" },
+  "mauve-banarsi": { photos:6, cut:"images/cut/mauve-banarsi.png", hero:false },
   "maroon-formal": { photos:6, cut:"images/cut/maroon-formal.png" },
   "chocolate-2pc": { photos:4 },
   "pink-kaftan": { photos:6 },
