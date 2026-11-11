@@ -304,3 +304,12 @@ html.feather-cur.native-cur #cur{opacity:0!important}
 .pg:first-child img.cv{object-fit:contain;object-position:center}
 .pg:not(:first-child) img{height:auto;aspect-ratio:auto;object-fit:contain}
 .ci-i img.cv,.cc .t img.cv{object-fit:contain!important;width:100%!important;height:100%!important;max-width:none!important}
+
+button.reel{border:0;padding:0;cursor:pointer;text-align:left}
+.rmodal{position:fixed;inset:0;z-index:100000;background:rgba(10,10,10,.92);display:flex;align-items:center;justify-content:center;gap:18px}
+.rmodal[hidden]{display:none}
+.rm-v{height:min(88vh,900px);aspect-ratio:9/16;max-width:92vw;background:#000;border-radius:14px;object-fit:contain}
+.rm-x{position:absolute;top:14px;right:18px;font:300 38px/1 var(--sans);color:#fff;background:none;border:0;cursor:pointer;z-index:2}
+.rm-n{font:300 44px/1 var(--sans);color:#fff;background:none;border:0;cursor:pointer;padding:0 10px}
+.rm-c{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#fff;font:500 11px var(--sans);letter-spacing:.2em;text-transform:uppercase;pointer-events:none}
+@media(max-width:700px){.rm-n{position:absolute;top:50%;z-index:2;text-shadow:0 0 8px #000}.rm-p{left:2px}.rm-nx{right:2px}.rm-v{height:84vh}}

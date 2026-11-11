@@ -117,3 +117,13 @@ window.MP_COLLECTIONS = {
   best: ["noor-e-afshan","rust-banarsi","azure-elegance","maroon-formal"],
   new:  ["green-chiffon-banarsi","mauve-banarsi","black-banarsi","lavender-dream"]
 };
+
+/* ============================================================
+   REELS (home page) - plays inside the website.
+   Put the video files in the  videos/  folder (mp4, H.264, vertical 9:16, ideally under 15 MB each),
+   then list them here. poster = still image shown before play.
+   Example:
+   { src:"videos/reel-1.mp4", poster:"images/products/noor-e-afshan.jpg", title:"Noor e Afshan" }
+   While this list is empty the Reels strip links to Instagram instead.
+   ============================================================ */
+window.MP_REELS = [];

@@ -117,7 +117,8 @@ pages.home=()=>{
  const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}">`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a><div class="mh-dots" id="mhDots"></div></div></section>`;
  const bs=(COL.best||[]).map(byId).filter(Boolean);
  const reelIds=["frida-chiffon","noor-e-afshan","rust-banarsi","pink-kaftan","black-banarsi","raja-rani-necklace","maroon-formal"].filter(id=>byId(id)&&media(byId(id)).photos.length);
- const reels=reelIds.map((id,i)=>{const p=byId(id),ph=media(p).photos;return `<a class="reel" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Watch on Instagram: ${esc(p.name)}"><img src="${ph[ph.length>1&&i%2?1:0]}" alt="${esc(p.name)}" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(p.name)}</span></a>`}).join("");
+const RV=window.MP_REELS||[];
+ const reels=RV.length?RV.map((v,i)=>`<button class="reel" data-reel="${i}" aria-label="Play reel: ${esc(v.title||"")}"><img src="${v.poster||""}" alt="" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(v.title||"")}</span></button>`).join(""):reelIds.map((id,i)=>{const p=byId(id),ph=media(p).photos;return `<a class="reel" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Watch on Instagram: ${esc(p.name)}"><img src="${ph[ph.length>1&&i%2?1:0]}" alt="${esc(p.name)}" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(p.name)}</span></a>`}).join("");
  const secs=`<section class="sec home-sec" id="best"><div class="sec-h"><h2>Best Sellers</h2><a class="link" href="collections.html?cat=best">View all</a></div><div class="grid">${bs.map(p=>card(p)).join("")}</div></section>
  <section class="sec home-sec reels"><div class="sec-h"><h2>Moorpankh Reels</h2><a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></div><div class="reel-row">${reels}</div></section>`;
  return mh+lb+secs};function initLookbook(){
@@ -288,6 +289,15 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
+ if(pg==="home"&&(window.MP_REELS||[]).length){const RV=window.MP_REELS;let k=0;const m=document.createElement("div");m.className="rmodal";m.hidden=true;
+  m.innerHTML='<button class="rm-x" aria-label="Close">×</button><button class="rm-n rm-p" aria-label="Previous">‹</button><video class="rm-v" playsinline controls loop></video><button class="rm-n rm-nx" aria-label="Next">›</button><div class="rm-c"></div>';document.body.appendChild(m);
+  const v=m.querySelector("video");const open=i=>{k=(i+RV.length)%RV.length;v.src=RV[k].src;v.poster=RV[k].poster||"";m.hidden=false;document.body.style.overflow="hidden";v.play().catch(()=>{});m.querySelector(".rm-c").textContent=RV[k].title||""};
+  const close=()=>{v.pause();v.removeAttribute("src");v.load();m.hidden=true;document.body.style.overflow=""};
+  document.querySelectorAll("[data-reel]").forEach(b=>b.onclick=()=>open(+b.dataset.reel));
+  m.querySelector(".rm-x").onclick=close;m.querySelector(".rm-p").onclick=()=>open(k-1);m.querySelector(".rm-nx").onclick=()=>open(k+1);
+  m.addEventListener("click",e=>{if(e.target===m)close()});
+  addEventListener("keydown",e=>{if(m.hidden)return;if(e.key==="Escape")close();if(e.key==="ArrowRight")open(k+1);if(e.key==="ArrowLeft")open(k-1)});
+  v.addEventListener("ended",()=>{});}
  if(pg==="home"){const hero=$("#mhHero"),sl=[...document.querySelectorAll("#mhHero .mh-s")],dots=$("#mhDots");if(hero&&sl.length>1){const n=sl.length;let k=0,tm,dx=0,prev=sl.map((_,q)=>q);
   dots.innerHTML=sl.map((_,q)=>'<button aria-label="Photo '+(q+1)+'"'+(q?"":' class="on"')+' data-n="'+q+'"></button>').join("");
   const d0=q=>{let d=((q-k)%n+n)%n;if(d>n/2)d-=n;return d};
