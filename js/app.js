@@ -127,11 +127,11 @@ const RV=window.MP_REELS||[];
  const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
  const N=L.length,side=new Array(N).fill("");
  function layout(){const H=stage.clientHeight*.76,W=stage.clientWidth;
-  els.forEach((el,i)=>{const d=((i-a)%N+N)%N;          // 0 = front, N-1..N-3 = the three on the left (wraps round)
-   let k=d===0?0:(d>=N-3&&d<N)?N-d:null;
+  els.forEach((el,i)=>{const d=i-a;          // 0 = front, -1..-3 = the three on the left; no wrap-around
+   let k=d===0?0:(d<0&&d>=-3)?-d:null;
    const st=el.style;
    if(k!==null){st.height=(H*S[k])+"px";st.width=(H*S[k]*.72)+"px";st.left=(W*X[k])+"px";st.bottom=B[k]+"px";st.opacity=O[k];st.zIndex=10-k;st.pointerEvents=k?"auto":"none";st.filter=k>=2?"grayscale(.35)":"none";side[i]=""}
-   else{const left=(N>=5&&d===N-4);const ns=left?"L":"R";
+   else{const left=d<0;const ns=left?"L":"R";
     if(side[i]&&side[i]!==ns){st.transition="none"}      // jump unseen across the screen (invisible) instead of flying over it
     if(left){st.height=(H*.25)+"px";st.width=(H*.14)+"px";st.left=(W*-.05)+"px";st.bottom=B[3]+"px";st.opacity=0;st.zIndex=1}
     else{st.height=(H*1.06)+"px";st.width=(H*1.06*.72)+"px";st.left=(W*.92)+"px";st.bottom=(B[0]-20)+"px";st.opacity=0;st.zIndex=11}
@@ -141,15 +141,18 @@ const RV=window.MP_REELS||[];
  function panel(first){const p=L[a],m=media(p),box=$("#lbIn");
   const fill=()=>{box.innerHTML=`<div class="lb-thumb ${m.cut?"":"ph"}">${thumbHTML(p)}</div><h2 class="lb-n">${esc(p.name)}</h2><p class="lb-d">${esc(p.desc)}</p><div class="lb-p">${priceTxt(p)}</div><a class="btn" href="product.html?id=${p.id}">Shop The Look</a>`;box.classList.remove("out")};
   if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
- function go(n){n=((n%N)+N)%N;if(busy||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
+ const nextSec=()=>{const b=$("#best");b&&b.scrollIntoView({behavior:"smooth"})};
+ function go(n){if(n>=N){nextSec();return}if(n<0)return;if(busy||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
- $("#lbDown").onclick=()=>{const b=$("#best");b&&b.scrollIntoView({behavior:"smooth"})};
+ $("#lbDown").onclick=nextSec;
  $("#lbPrev").onclick=()=>go(a-1);$("#lbNext").onclick=()=>go(a+1);
  els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
  let locked=false,lastT=0,acc=0,lastW=0;
  addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2||e.ctrlKey)return;
   const unit=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;
   const d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*unit;if(!d)return;
+  if(a===N-1&&d>0){if(Date.now()-lastT<900)e.preventDefault();return}                                // last model: scrolling carries on to the next section
+  if(a===0&&d<0)return;
   e.preventDefault();                                    // while the hero is in view, wheel moves the lookbook
   const now=Date.now(),gap=now-lastW;lastW=now;
   const dir=d>0?1:-1;
