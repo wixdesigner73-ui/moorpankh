@@ -297,3 +297,10 @@ html.feather-cur.native-cur #cur{opacity:0!important}
 .reel-play{position:absolute;z-index:2;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:10px;color:#111;padding-left:2px}
 .reel-t{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;color:#fff;font:500 11px/1.3 var(--sans);letter-spacing:.08em}
 @media(max-width:900px){.home-sec .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reel{flex-basis:46vw}}
+/* model photos are never cropped: portrait frames, contain on the product page */
+.pc-img{aspect-ratio:2/3}
+.pc-img .cover,.pc-img .alt{object-fit:cover;object-position:center top}
+.pg:first-child{background:var(--soft)}
+.pg:first-child img.cv{object-fit:contain;object-position:center}
+.pg:not(:first-child) img{height:auto;aspect-ratio:auto;object-fit:contain}
+.ci-i img.cv,.cc .t img.cv{object-fit:contain!important;width:100%!important;height:100%!important;max-width:none!important}
