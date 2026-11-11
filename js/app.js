@@ -89,7 +89,7 @@ function footer(){
  <div><h6>Editorial</h6><ul><li><a href="index.html">The Lookbook</a></li><li><a href="about.html">About Us</a></li><li><a href="account.html">My Account</a></li><li><a href="account.html#orders">Order History</a></li></ul></div>
  <div><h6>Curations</h6><ul><li><a href="collections.html">All Products</a></li><li><a href="collections.html?cat=sarees">Vintage Sarees</a></li><li><a href="collections.html?cat=jewellery">Handmade Jewellery</a></li><li><a href="collections.html?cat=new">New Arrivals</a></li></ul></div>
  <div><h6>Assistance</h6><ul><li><a href="shipping.html">Shipping &amp; Returns</a></li><li><a href="faq.html">FAQs</a></li><li><a href="contact.html">Contact</a></li><li><a href="wishlist.html">Saved Pieces</a></li></ul></div></div>
- <img class="ft-mark" src="images/logo-light.png" alt=""><div class="ft-c">© ${new Date().getFullYear()} Moorpankh · ${C.city}<span class="ft-by">Designed by <b>Zcorebit</b></span></div></footer>
+ <img class="ft-mark" src="images/logo-light.png" alt=""><div class="ft-c">© ${new Date().getFullYear()} Moorpankh · ${C.city}<span class="ft-by">Designed by <a href="https://www.zcorebit.com" target="_blank" rel="noopener"><b>Zcorebit</b></a></span></div></footer>
  <a class="wa-fab" href="${waLink("Hello Moorpankh! I would like some help.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${WAFAB}</a><button class="totop" id="toTop" aria-label="Back to top">${I.up}</button>`}
 
 /* ---------- drawers ---------- */

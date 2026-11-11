@@ -380,3 +380,4 @@ button.reel{border:0;padding:0;cursor:pointer;text-align:left}
 .qc-model{left:50%}
 @media(max-width:900px){.qc-model{left:31%}.qc-txt{right:4%}.qc-txt em,.qc-txt b{font-size:1.8rem}}
 .ft-by{display:block;margin-top:8px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.6}.ft-by b{font-weight:600;opacity:1;letter-spacing:.2em}
+.ft-by a{color:inherit;border-bottom:1px solid rgba(255,255,255,.35)}.ft-by a:hover{opacity:.8}
