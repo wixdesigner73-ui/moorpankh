@@ -86,7 +86,6 @@ function chrome(){
  <nav class="mnav" aria-label="Quick"><a href="index.html" class="${pg==="home"?"on":""}" aria-label="Home">${I.home}</a><button id="sBtn2" aria-label="Search">${I.search}</button><a href="account.html" class="${pg==="account"?"on":""}" aria-label="Account">${I.user}</a><a href="collections.html" class="${NAV[pg]==="collections"?"on":""}" aria-label="Collections">${I.film}</a></nav>`}
 function footer(){
  const fab=`<a class="wa-fab" href="${waLink("Hello Moorpankh! I would like some help.")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">${WAFAB}</a>`;
- if(pg==="home")return fab;
  return `<footer class="ft"><div class="ft-g"><div><h6>Inner Circle</h6><form class="ft-news" id="nf"><input type="email" required placeholder="Email" aria-label="Email"><button aria-label="Subscribe">→</button></form><h6>Customer Support</h6><div class="ft-soc"><a href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a><a href="${waLink("Hello Moorpankh!")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="mailto:${C.email}" aria-label="Email">${I.mail}</a></div></div>
  <div><h6>Editorial</h6><ul><li><a href="index.html">The Lookbook</a></li><li><a href="about.html">About Us</a></li><li><a href="account.html">My Account</a></li><li><a href="account.html#orders">Order History</a></li></ul></div>
  <div><h6>Curations</h6><ul><li><a href="collections.html">All Products</a></li><li><a href="collections.html?cat=sarees">Vintage Sarees</a></li><li><a href="collections.html?cat=jewellery">Handmade Jewellery</a></li><li><a href="collections.html?cat=new">New Arrivals</a></li></ul></div>
@@ -114,10 +113,15 @@ const latest=()=>{const a=[...COL.new,...P.filter(hasPic).map(p=>p.id)];return [
 const lookbookItems=()=>P.filter(p=>media(p).cut&&(MEDIA[p.id]||{}).hero!==false);
 pages.home=()=>{
  const L=lookbookItems();
- const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><div class="lb-hint">Scroll</div></div>
+ const lb=`<section class="lb" id="lb"><div class="lb-stage" id="lbStage">${L.map((p,i)=>`<button class="lb-m" data-i="${i}" aria-label="${esc(p.name)}"><img src="${media(p).cut}" alt="${esc(p.name)}"></button>`).join("")}<div class="lb-count" id="lbCount"></div><div class="lb-arrows"><button id="lbPrev" aria-label="Previous">‹</button><button id="lbNext" aria-label="Next">›</button></div><button class="lb-hint" id="lbDown" aria-label="Scroll to best sellers">Explore ↓</button></div>
   <aside class="lb-panel" aria-live="polite"><div class="lb-in" id="lbIn"></div></aside></section>`;
  const mh=`<section class="mh"><div class="mh-hero" id="mhHero">${["noor-e-afshan","rust-banarsi","green-chiffon-banarsi","maroon-formal","black-banarsi","azure-elegance"].map((id,i)=>`<img class="mh-s ${i?"":"on"}" src="images/products/${id}.jpg?v=pp" alt="${esc(byId(id).name)}">`).join("")}<a class="mh-cta glass" href="collections.html">Shop Now</a><div class="mh-dots" id="mhDots"></div></div></section>`;
- return mh+lb};function initLookbook(){
+ const bs=(COL.best||[]).map(byId).filter(Boolean);
+ const reelIds=["frida-chiffon","noor-e-afshan","rust-banarsi","pink-kaftan","black-banarsi","raja-rani-necklace","maroon-formal"].filter(id=>byId(id)&&media(byId(id)).photos.length);
+ const reels=reelIds.map((id,i)=>{const p=byId(id),ph=media(p).photos;return `<a class="reel" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Watch on Instagram: ${esc(p.name)}"><img src="${ph[ph.length>1&&i%2?1:0]}" alt="${esc(p.name)}" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(p.name)}</span></a>`}).join("");
+ const secs=`<section class="sec home-sec" id="best"><div class="sec-h"><h2>Best Sellers</h2><a class="link" href="collections.html?cat=best">View all</a></div><div class="grid">${bs.map(p=>card(p)).join("")}</div></section>
+ <section class="sec home-sec reels"><div class="sec-h"><h2>Moorpankh Reels</h2><a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></div><div class="reel-row">${reels}</div></section>`;
+ return mh+lb+secs};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
  let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
  const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
@@ -139,20 +143,21 @@ pages.home=()=>{
   if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
  function go(n){n=((n%N)+N)%N;if(busy||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
+ $("#lbDown").onclick=()=>{const b=$("#best");b&&b.scrollIntoView({behavior:"smooth"})};
  $("#lbPrev").onclick=()=>go(a-1);$("#lbNext").onclick=()=>go(a+1);
  els.forEach((el,i)=>el.addEventListener("click",()=>go(i)));
  let locked=false,lastT=0,acc=0,lastW=0;
  addEventListener("wheel",e=>{if(innerWidth<=900||scrollY>2||e.ctrlKey)return;
   const unit=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1;
   const d=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*unit;if(!d)return;
-  e.preventDefault();                                    // home never scrolls the page itself
+  e.preventDefault();                                    // while the hero is in view, wheel moves the lookbook
   const now=Date.now(),gap=now-lastW;lastW=now;
   const dir=d>0?1:-1;
   if(locked){ if(now-lastT>700&&gap>110)locked=false; else return }   // one glide = one step; unlock after a pause
   if(gap>220||Math.sign(acc)!==dir)acc=0;acc+=d;         // add up tiny trackpad deltas
   if(Math.abs(acc)<45)return;
   locked=true;lastT=now;acc=0;go(a+dir)},{passive:false});
- addEventListener("keydown",e=>{if(innerWidth<=900||scrollY>2||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight"||e.key==="ArrowDown")go(a+1);if(e.key==="ArrowLeft"||e.key==="ArrowUp")go(a-1)});
+ addEventListener("keydown",e=>{if(innerWidth<=900||scrollY>2||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==="ArrowRight")go(a+1);if(e.key==="ArrowLeft")go(a-1)});
  let sx=null;stage.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});stage.addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(a+(dx<0?1:-1));sx=null});
 }
 

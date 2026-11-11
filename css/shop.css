@@ -254,8 +254,6 @@ html{overflow-x:clip}body{overflow-x:clip;max-width:100vw}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.d2{grid-template-columns:minmax(0,1fr)}}
 
 /* home = one locked screen: vertical scroll only moves the lookbook sideways */
-body[data-page=home]{overflow:hidden;height:100vh;height:100dvh}
-body[data-page=home] main{height:100vh;height:100dvh;overflow:hidden}
 body[data-page=home] .lb{height:calc(100dvh - var(--hh))}
 @media(max-width:900px){body[data-page=home] .mh-hero{height:100dvh}}
 .lb-arrows{position:absolute;right:28px;bottom:20px;display:flex;gap:8px;z-index:20}
@@ -286,3 +284,16 @@ html.feather-cur.native-cur #cur{opacity:0!important}
 .mh-hero{touch-action:pan-y}
 .mh-hero .mh-s{opacity:1!important;will-change:transform}
 .mh-hero::after{z-index:1;pointer-events:none}
+
+.lb-hint{pointer-events:auto;cursor:pointer;background:none;border:0;font-family:var(--sans);color:#8d877d}
+.lb-hint:hover{color:var(--ink)}
+.home-sec .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.reel-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:none}
+.reel-row::-webkit-scrollbar{display:none}
+.reel{position:relative;flex:0 0 clamp(170px,19vw,250px);aspect-ratio:9/16;overflow:hidden;background:#e7e2d9;scroll-snap-align:start;display:block}
+.reel img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.reel:hover img{transform:scale(1.04)}
+.reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55))}
+.reel-play{position:absolute;z-index:2;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:10px;color:#111;padding-left:2px}
+.reel-t{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;color:#fff;font:500 11px/1.3 var(--sans);letter-spacing:.08em}
+@media(max-width:900px){.home-sec .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reel{flex-basis:46vw}}
