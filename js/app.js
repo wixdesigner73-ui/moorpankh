@@ -119,7 +119,20 @@ pages.home=()=>{
  const reelIds=["frida-chiffon","noor-e-afshan","rust-banarsi","pink-kaftan","black-banarsi","raja-rani-necklace","maroon-formal"].filter(id=>byId(id)&&media(byId(id)).photos.length);
 const RV=window.MP_REELS||[];
  const reels=RV.length?RV.map((v,i)=>`<button class="reel" data-reel="${i}" aria-label="Play reel: ${esc(v.title||"")}"><img src="${v.poster||""}" alt="" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(v.title||"")}</span></button>`).join(""):reelIds.map((id,i)=>{const p=byId(id),ph=media(p).photos;return `<a class="reel" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener" aria-label="Watch on Instagram: ${esc(p.name)}"><img src="${ph[ph.length>1&&i%2?1:0]}" alt="${esc(p.name)}" loading="lazy"><span class="reel-play">▶</span><span class="reel-t">${esc(p.name)}</span></a>`}).join("");
- const secs=`<section class="sec home-sec" id="best"><div class="sec-h"><h2>Best Sellers</h2><a class="link" href="collections.html?cat=best">View all</a></div><div class="grid">${bs.map(p=>card(p)).join("")}</div></section>
+ const fp=byId("rust-banarsi"),fm=media(fp);
+ const feat=`<section class="qc home-sec" id="edit"><div class="qc-in">
+  <div class="qc-l"><p class="qc-top"><span class="qc-av"><img src="${(media(byId("noor-e-afshan")).photos[0])}" alt=""><img src="${(media(byId("black-banarsi")).photos[0])}" alt=""><img src="${(media(byId("azure-elegance")).photos[0])}" alt=""></span>Vintage sarees &amp; handmade jewellery · ${esc(C.city.split(",")[0])}</p>
+   <h2>Wear the timeless<br><em>grace</em><i class="qc-dot"></i></h2>
+   <p class="qc-p">Pieces chosen for their craft and character, and made to be worn for years.</p>
+   <div class="qc-cta"><a class="qc-btn" href="collections.html">Shop now</a><a class="qc-go" href="collections.html" aria-label="Shop all">→</a></div></div>
+  <div class="qc-r"><span class="qc-c1"><img src="${media(byId("pink-kaftan")).photos[0]}" alt=""></span><a class="qc-c2" href="collections.html?cat=new" aria-label="New arrivals">↗</a><span class="qc-c3"></span><div class="qc-st"><b>[ ${P.length} ]</b><small>Pieces in the collection</small></div></div>
+  <div class="qc-band"><div class="qc-bars"></div><div class="qc-txt"><em>Vintage</em><b>SAREE EDIT</b></div></div>
+  <img class="qc-model" src="${fm.cut}" alt="${esc(fp.name)}">
+  <a class="qc-chip" href="product.html?id=${fp.id}"><img src="${fm.photos[0]}" alt=""><span><small>Featured</small><b>${esc(fp.name)}</b><small>${priceTxt(fp)}</small></span></a>
+ </div></section>`;
+ const gl=[["frida-chiffon",0,"m"],["raja-rani-necklace",0,"s"],["noor-e-afshan",1,"l"],["hair-accessory",0,"s"],["azure-elegance",0,"m"],["rust-banarsi",1,"l"],["ethnic-bangles",0,"s"],["black-banarsi",1,"m"],["pink-kaftan",0,"l"],["maroon-formal",0,"s"]].filter(g=>byId(g[0])&&media(byId(g[0])).photos.length);
+ const gal=`<section class="gal home-sec" id="gallery"><div class="sec-h"><h2>The Gallery</h2><a class="link" href="collections.html">Visit the collection ↗</a></div><div class="gal-row" id="galRow">${gl.map(([id,n,z])=>{const p=byId(id),ph=media(p).photos;return `<a class="gal-t gal-${z}" href="product.html?id=${id}" aria-label="${esc(p.name)}"><img src="${ph[Math.min(n,ph.length-1)]}" alt="${esc(p.name)}" loading="lazy" draggable="false"></a>`}).join("")}</div><div class="gal-bar" id="galBar"><span></span></div></section>`;
+ const secs=feat+gal+`<section class="sec home-sec" id="best"><div class="sec-h"><h2>Best Sellers</h2><a class="link" href="collections.html?cat=best">View all</a></div><div class="grid">${bs.map(p=>card(p)).join("")}</div></section>
  <section class="sec home-sec reels"><div class="sec-h"><h2>Moorpankh Reels</h2><a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></div><div class="reel-row">${reels}</div></section>`;
  return mh+lb+secs};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
@@ -141,7 +154,7 @@ const RV=window.MP_REELS||[];
  function panel(first){const p=L[a],m=media(p),box=$("#lbIn");
   const fill=()=>{box.innerHTML=`<div class="lb-thumb ${m.cut?"":"ph"}">${thumbHTML(p)}</div><h2 class="lb-n">${esc(p.name)}</h2><p class="lb-d">${esc(p.desc)}</p><div class="lb-p">${priceTxt(p)}</div><a class="btn" href="product.html?id=${p.id}">Shop The Look</a>`;box.classList.remove("out")};
   if(first){fill();return}box.classList.add("out");setTimeout(fill,260)}
- const nextSec=()=>{const b=$("#best");b&&b.scrollIntoView({behavior:"smooth"})};
+ const nextSec=()=>{const b=$("#edit")||$("#best");b&&b.scrollIntoView({behavior:"smooth"})};
  function go(n){if(n>=N){nextSec();return}if(n<0)return;if(busy||n===a)return;busy=true;a=n;layout();panel();setTimeout(()=>busy=false,650)}
  layout();panel(true);addEventListener("resize",layout);
  $("#lbDown").onclick=nextSec;
@@ -292,6 +305,11 @@ function boot(){
  $("#sq").addEventListener("input",e=>renderSearch(e.target.value));
  const nf=$("#nf");if(nf)nf.onsubmit=e=>{e.preventDefault();const l=store.get("news",[]);l.push(nf.querySelector("input").value);store.set("news",l);nf.reset();toast("Thank you")};
  if(pg==="home")initLookbook();
+ if(pg==="home"){const row=$("#galRow"),bar=$("#galBar");if(row&&bar){const upd=()=>{const mx=row.scrollWidth-row.clientWidth;const f=mx>0?row.scrollLeft/mx:0,w=Math.max(.18,row.clientWidth/row.scrollWidth);bar.firstElementChild.style.width=(w*100)+"%";bar.firstElementChild.style.marginLeft=(f*(1-w)*100)+"%"};
+  row.addEventListener("scroll",upd,{passive:true});addEventListener("resize",upd);upd();
+  let dn=false,sx=0,sl=0,mv=0;row.addEventListener("mousedown",e=>{dn=true;mv=0;sx=e.pageX;sl=row.scrollLeft;row.classList.add("drag")});
+  addEventListener("mouseup",()=>{dn=false;row.classList.remove("drag")});addEventListener("mousemove",e=>{if(!dn)return;mv=Math.abs(e.pageX-sx);row.scrollLeft=sl-(e.pageX-sx)});
+  row.addEventListener("click",e=>{if(mv>6){e.preventDefault();e.stopPropagation()}},true)}}
  if(pg==="home"&&(window.MP_REELS||[]).length){const RV=window.MP_REELS;let k=0;const m=document.createElement("div");m.className="rmodal";m.hidden=true;
   m.innerHTML='<button class="rm-x" aria-label="Close">×</button><button class="rm-n rm-p" aria-label="Previous">‹</button><video class="rm-v" playsinline controls loop></video><button class="rm-n rm-nx" aria-label="Next">›</button><div class="rm-c"></div>';document.body.appendChild(m);
   const v=m.querySelector("video");const open=i=>{k=(i+RV.length)%RV.length;v.src=RV[k].src;v.poster=RV[k].poster||"";m.hidden=false;document.body.style.overflow="hidden";v.play().catch(()=>{});m.querySelector(".rm-c").textContent=RV[k].title||""};
