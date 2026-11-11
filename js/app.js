@@ -16,7 +16,7 @@ const inCat=(p,c)=>c==="all"||(c==="best"?COL.best.includes(p.id):c==="new"?COL.
 function media(p){const m=MEDIA[p.id]||{};const photos=[];for(let i=0;i<(m.photos||0);i++)photos.push(`images/products/${p.id}${i?"-"+(i+1):""}.jpg?v=pp`);return{cut:m.cut?m.cut+"?v=11":null,photos}}
 const hasPic=p=>{const m=media(p);return !!(m.cut||m.photos.length)};
 const MARK='<img src="images/peacock.png" alt="" aria-hidden="true">';
-function thumbHTML(p){const m=media(p);return m.cut?`<img src="${m.cut}" alt="${esc(p.name)}">`:m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
+function thumbHTML(p){const m=media(p);return m.photos[0]?`<img class="cv" src="${m.photos[0]}" alt="${esc(p.name)}">`:MARK}
 
 /* ---------- icons ---------- */
 const I={
@@ -57,8 +57,7 @@ const users=()=>store.get("users",[]);const me=()=>{const e=store.get("session",
 /* ---------- product card ---------- */
 function card(p){
  const m=media(p);let img;
- if(m.cut)img=`<img class="cut" src="${m.cut}" alt="${esc(p.name)}" loading="lazy">${m.photos[1]?`<img class="alt" src="${m.photos[1]}" alt="" loading="lazy">`:m.photos[0]?`<img class="alt" src="${m.photos[0]}" alt="" loading="lazy">`:""}`;
- else if(m.photos[0])img=`<img class="cover" src="${m.photos[0]}" alt="${esc(p.name)}" loading="lazy">${m.photos[1]?`<img class="alt" src="${m.photos[1]}" alt="" loading="lazy">`:""}`;
+ if(m.photos[0])img=`<img class="cover" src="${m.photos[0]}" alt="${esc(p.name)}" loading="lazy">${m.photos[1]?`<img class="alt" src="${m.photos[1]}" alt="" loading="lazy">`:""}`;
  else img=MARK;
  const tag=p.stock===0?"Sold out":"";
  return `<article class="pc"><a class="pc-img ${img===MARK?"empty":""}" href="product.html?id=${p.id}" aria-label="${esc(p.name)}">${tag?`<span class="pc-tag">${tag}</span>`:""}${img}</a>
