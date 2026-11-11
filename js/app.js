@@ -125,7 +125,6 @@ const RV=window.MP_REELS||[];
    <h2>Wear the timeless<br><em>grace</em><i class="qc-dot"></i></h2>
    <p class="qc-p">Pieces chosen for their craft and character, and made to be worn for years.</p>
    <div class="qc-cta"><a class="qc-btn" href="collections.html">Shop now</a><a class="qc-go" href="collections.html" aria-label="Shop all">→</a></div></div>
-  <div class="qc-r"><span class="qc-c1"><img src="${media(byId("pink-kaftan")).photos[0]}" alt=""></span><a class="qc-c2" href="collections.html?cat=new" aria-label="New arrivals">↗</a><span class="qc-c3"></span><div class="qc-st"><b>[ ${P.length} ]</b><small>Pieces in the collection</small></div></div>
   <div class="qc-band"><div class="qc-bars"></div><div class="qc-txt"><em>Vintage</em><b>SAREE EDIT</b></div></div>
   <img class="qc-model" src="${fm.cut}" alt="${esc(fp.name)}">
   <a class="qc-chip" href="product.html?id=${fp.id}"><img src="${fm.photos[0]}" alt=""><span><small>Featured</small><b>${esc(fp.name)}</b><small>${priceTxt(fp)}</small></span></a>
@@ -136,7 +135,7 @@ const RV=window.MP_REELS||[];
  <section class="sec home-sec reels"><div class="sec-h"><h2>Moorpankh Reels</h2><a class="link" href="https://instagram.com/${C.instagram}" target="_blank" rel="noopener">@${C.instagram}</a></div><div class="reel-row">${reels}</div></section>`;
  return mh+lb+secs};function initLookbook(){
  const L=lookbookItems(),stage=$("#lbStage");if(!stage||!L.length)return;
- let a=Math.min(3,L.length-1),busy=false,t0=0;const els=$$(".lb-m",stage);
+ let a=0,busy=false,t0=0;const els=$$(".lb-m",stage);
  const S=[1,.69,.47,.34],X=[.70,.41,.22,.075],B=[78,175,236,290],O=[1,.97,.52,.2];
  const N=L.length,side=new Array(N).fill("");
  function layout(){const H=stage.clientHeight*.76,W=stage.clientWidth;
