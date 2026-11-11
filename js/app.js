@@ -195,8 +195,7 @@ pages.product=()=>{
  const id=new URLSearchParams(location.search).get("id"),p=byId(id);
  if(!p)return `<div class="pg-wrap"><p class="pg-title">Piece not found</p><a class="link" href="collections.html">Back to collections</a></div>`;
  document.title=p.name+" — Moorpankh";const m=media(p);
- const imgs=[];if(m.cut)imgs.push({s:m.cut,c:""});else if(m.photos[0])imgs.push({s:m.photos[0],c:"cv"});
- (m.cut?m.photos:m.photos.slice(1)).forEach(s=>imgs.push({s,c:"cv"}));
+ const imgs=m.photos.map(s=>({s,c:"cv"}));   // real photos only, no cut-outs on the product page
  const gal=imgs.length?imgs.map((x,i)=>`<div class="pg" data-z="${x.s}">${i===0?`<button class="pg-bm ${wish.includes(p.id)?"on":""}" data-wish="${p.id}" aria-label="Save">${I.bm}</button>`:""}<img class="${x.c}" src="${x.s}" alt="${esc(p.name)}"></div>`).join(""):`<div class="pg empty"><img src="images/peacock.png" alt=""></div>`;
  const rel=P.filter(x=>x.cat===p.cat&&x.id!==p.id).sort((a,b)=>hasPic(b)-hasPic(a)).slice(0,4);
  const msg=`Hello Moorpankh! I'd like to order / ask about: ${p.name}${p.price?" ("+money(p.price)+")":""}. ${location.href}`;
